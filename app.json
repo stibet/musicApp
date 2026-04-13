@@ -1,43 +1,37 @@
 {
   "expo": {
-    "name": "mizmiz",
-    "slug": "mizmiz",
-    "version": "1.0.0",
+    "name": "Makam Coach",
+    "slug": "makam-coach",
+    "version": "2.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "mizmiz",
-    "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+    "scheme": "makamcoach",
+    "userInterfaceStyle": "dark",
     "splash": {
       "image": "./assets/images/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#080B0F"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": false,
+      "bundleIdentifier": "com.makamcoach.app"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#080B0F"
       },
-      "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "package": "com.makamcoach.app"
     },
     "web": {
       "bundler": "metro",
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
-"plugins": [
-  "expo-router",
-  [
-    "expo-av",
-    {
-      "microphonePermission": "Mizmiz uygulaması mikrofona erişmek istiyor."
-    }
-  ]
-],
+    "plugins": [
+      "expo-router",
+      ["expo-av", { "microphonePermission": "Makam Coach mikrofona erişmek istiyor — canlı perde analizi için gereklidir." }]
+    ],
     "experiments": {
       "typedRoutes": true
     }

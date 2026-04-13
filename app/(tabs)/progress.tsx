@@ -1,85 +1,105 @@
 import { useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { C, F, R } from '../../constants/Design';
 import { sorular } from '../../src/data/sorular';
-import { useDilStore } from '../../src/store/dilStore';
 import { Ilerleme, ilerlemeYukle } from '../../src/store/progress';
+import { CoachSessionRecord, loadCoachSessions } from '../../src/store/sessionHistory';
 
 export default function ProgressScreen() {
   const [ilerleme, setIlerleme] = useState<Ilerleme | null>(null);
-  const { tr } = useDilStore();
-  useFocusEffect(useCallback(() => { ilerlemeYukle().then(setIlerleme); }, []));
+  const [sessions, setSessions] = useState<CoachSessionRecord[]>([]);
 
-  if (!ilerleme) return <SafeAreaView style={s.container}><View style={s.ortala}><Text style={{ color: '#888' }}>...</Text></View></SafeAreaView>;
+  useFocusEffect(useCallback(() => {
+    ilerlemeYukle().then(setIlerleme);
+    loadCoachSessions().then(setSessions);
+  }, []));
 
-  const toplamCevap = ilerleme.toplamDogru + ilerleme.toplamYanlis;
-  const basariYuzde = toplamCevap > 0 ? Math.round((ilerleme.toplamDogru / toplamCevap) * 100) : 0;
+  const toplamCevap = (ilerleme?.toplamDogru || 0) + (ilerleme?.toplamYanlis || 0);
+  const basariYuzde = toplamCevap > 0 ? Math.round(((ilerleme?.toplamDogru || 0) / toplamCevap) * 100) : 0;
+  const avgSession = sessions.length ? Math.round(sessions.reduce((s, i) => s + i.successPct, 0) / sessions.length) : 0;
 
-  const zayif = Object.values(ilerleme.sorular).filter(s => s.yanlis > 0).sort((a, b) => b.yanlis - a.yanlis).slice(0, 5)
-    .map(s => ({ ...s, soruMetni: sorular.find(q => q.id === s.soruId)?.soru || s.soruId, kategori: sorular.find(q => q.id === s.soruId)?.kategori || '' }));
-
-  const guclu = Object.values(ilerleme.sorular).filter(s => s.dogru >= 3 && s.yanlis === 0).sort((a, b) => b.dogru - a.dogru).slice(0, 3)
-    .map(s => ({ ...s, soruMetni: sorular.find(q => q.id === s.soruId)?.soru || s.soruId }));
+  const zayif = ilerleme
+    ? Object.values(ilerleme.sorular).filter(s => s.yanlis > 0).sort((a, b) => b.yanlis - a.yanlis).slice(0, 3)
+        .map(s => ({ ...s, soruMetni: sorular.find(q => q.id === s.soruId)?.soru || s.soruId }))
+    : [];
 
   return (
     <SafeAreaView style={s.container}>
-      <ScrollView contentContainerStyle={s.content}>
-        <Text style={s.baslik}>📊 {tr.ilerleme}</Text>
-        <View style={s.streakKart}>
-          <Text style={s.streakEmoji}>🔥</Text>
-          <View><Text style={s.streakSayi}>{ilerleme.streak}</Text><Text style={s.streakLabel}>{tr.gunlukSeri}</Text></View>
+      <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
+        <Text style={s.pageTitle}>İlerleme</Text>
+        <Text style={s.pageSub}>Koç seansları ve quiz istatistiklerin</Text>
+
+        {/* Özet */}
+        <View style={s.heroRow}>
+          <View style={[s.heroKart, { borderColor: C.gold + '44' }]}>
+            <Text style={s.heroVal}>{sessions.length}</Text>
+            <Text style={s.heroLabel}>Seans</Text>
+          </View>
+          <View style={[s.heroKart, { borderColor: C.green + '44' }]}>
+            <Text style={[s.heroVal, { color: C.green }]}>%{avgSession}</Text>
+            <Text style={s.heroLabel}>Ort. Başarı</Text>
+          </View>
+          <View style={[s.heroKart, { borderColor: C.amber + '44' }]}>
+            <Text style={[s.heroVal, { color: C.amber }]}>{ilerleme?.streak || 0}</Text>
+            <Text style={s.heroLabel}>🔥 Seri</Text>
+          </View>
         </View>
+
+        {/* Quiz istatistikleri */}
+        <Text style={s.sectionTitle}>Quiz İstatistikleri</Text>
         <View style={s.grid}>
           {[
-            { sayi: ilerleme.toplamDogru, renk: '#4caf50', label: tr.dogru },
-            { sayi: ilerleme.toplamYanlis, renk: '#e94560', label: tr.yanlis },
-            { sayi: `%${basariYuzde}`, renk: '#4ecdc4', label: tr.basari },
-            { sayi: Object.keys(ilerleme.sorular).length, renk: '#a78bfa', label: tr.soruGoruldu },
+            { label: 'Başarı', val: `%${basariYuzde}`, renk: C.green },
+            { label: 'Doğru', val: `${ilerleme?.toplamDogru || 0}`, renk: C.green },
+            { label: 'Yanlış', val: `${ilerleme?.toplamYanlis || 0}`, renk: C.red },
+            { label: 'Görülen', val: `${Object.keys(ilerleme?.sorular || {}).length}`, renk: C.teal },
           ].map((item, i) => (
-            <View key={i} style={s.istatKart}>
-              <Text style={[s.istatSayi, { color: item.renk }]}>{item.sayi}</Text>
-              <Text style={s.istatLabel}>{item.label}</Text>
+            <View key={i} style={s.statKart}>
+              <Text style={[s.statVal, { color: item.renk }]}>{item.val}</Text>
+              <Text style={s.statLabel}>{item.label}</Text>
             </View>
           ))}
         </View>
-        <View style={s.bolum}>
-          <Text style={s.bolumBaslik}>{tr.genelBasari}</Text>
-          <View style={s.progressBar}><View style={[s.progressFill, { width: `${basariYuzde}%` }]} /></View>
-          <Text style={s.progressLabel}>%{basariYuzde} — {toplamCevap} soru</Text>
-        </View>
+
+        {/* Zayıf konular */}
         {zayif.length > 0 && (
-          <View style={s.bolum}>
-            <Text style={s.bolumBaslik}>{tr.zayifKonular}</Text>
+          <>
+            <Text style={s.sectionTitle}>Tekrar Et</Text>
             {zayif.map((item, i) => (
-              <View key={i} style={s.konuKart}>
-                <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                  <Text style={{ fontSize: 18 }}>{item.kategori === 'makam' ? '🕌' : '🎼'}</Text>
-                  <Text style={s.konuMetin} numberOfLines={2}>{item.soruMetni}</Text>
-                </View>
-                <View style={{ alignItems: 'flex-end' }}>
-                  <Text style={{ color: '#e94560', fontWeight: 'bold' }}>✗ {item.yanlis}</Text>
-                  <Text style={{ color: '#4caf50', fontWeight: 'bold' }}>✓ {item.dogru}</Text>
+              <View key={i} style={s.zayifKart}>
+                <Text style={s.zayifMetin} numberOfLines={2}>{item.soruMetni}</Text>
+                <View style={s.zayifBadge}>
+                  <Text style={s.zayifBadgeText}>✗ {item.yanlis}</Text>
                 </View>
               </View>
             ))}
-          </View>
+          </>
         )}
-        {guclu.length > 0 && (
-          <View style={s.bolum}>
-            <Text style={s.bolumBaslik}>{tr.gucluKonular}</Text>
-            {guclu.map((item, i) => (
-              <View key={i} style={[s.konuKart, { borderLeftColor: '#4caf50' }]}>
-                <Text style={s.konuMetin} numberOfLines={2}>{item.soruMetni}</Text>
-                <Text style={{ color: '#4caf50', fontWeight: 'bold' }}>✓ {item.dogru}</Text>
+
+        {/* Koç seansları */}
+        <Text style={s.sectionTitle}>Son Koç Seansları</Text>
+        {sessions.length === 0 ? (
+          <View style={s.bosKart}>
+            <Text style={s.bosText}>Henüz kaydedilmiş seans yok.</Text>
+            <Text style={s.bosAlt}>Makam Koçu'nda bir dizi tamamlayıp kaydet.</Text>
+          </View>
+        ) : (
+          sessions.slice(0, 8).map(ses => (
+            <View key={ses.id} style={s.sesKart}>
+              <View style={{ flex: 1 }}>
+                <Text style={s.sesBaslik}>{ses.makamTitle}</Text>
+                <Text style={s.sesMeta}>{ses.mode === 'scale' ? 'Dizi' : ses.phraseTitle || 'Cümle'} · {ses.instrumentTitle}</Text>
+                <Text style={s.sesTarih}>{new Date(ses.timestamp).toLocaleDateString('tr-TR')}</Text>
               </View>
-            ))}
-          </View>
-        )}
-        {toplamCevap === 0 && (
-          <View style={{ backgroundColor: '#16213e', borderRadius: 16, padding: 32, alignItems: 'center' }}>
-            <Text style={{ fontSize: 48, marginBottom: 12 }}>🎯</Text>
-            <Text style={{ color: '#666', fontSize: 16, textAlign: 'center' }}>{tr.hicSoruYok}</Text>
-          </View>
+              <View style={s.sesSkor}>
+                <Text style={[s.sesSkorVal, { color: ses.successPct >= 70 ? C.green : ses.successPct >= 40 ? C.amber : C.red }]}>
+                  %{ses.successPct}
+                </Text>
+                <Text style={s.sesKoma}>{ses.avgAbsKoma} koma</Text>
+              </View>
+            </View>
+          ))
         )}
       </ScrollView>
     </SafeAreaView>
@@ -87,16 +107,31 @@ export default function ProgressScreen() {
 }
 
 const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#1a1a2e' }, ortala: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  content: { padding: 20 }, baslik: { fontSize: 26, fontWeight: 'bold', color: '#fff', marginTop: 20, marginBottom: 20 },
-  streakKart: { backgroundColor: '#16213e', borderRadius: 16, padding: 20, flexDirection: 'row', alignItems: 'center', gap: 16, marginBottom: 16, borderLeftWidth: 4, borderLeftColor: '#f5a623' },
-  streakEmoji: { fontSize: 40 }, streakSayi: { fontSize: 36, fontWeight: 'bold', color: '#f5a623' }, streakLabel: { color: '#888', fontSize: 14 },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: 20 },
-  istatKart: { flex: 1, minWidth: '44%', backgroundColor: '#16213e', borderRadius: 12, padding: 16, alignItems: 'center' },
-  istatSayi: { fontSize: 28, fontWeight: 'bold' }, istatLabel: { color: '#666', fontSize: 12, marginTop: 4 },
-  bolum: { marginBottom: 24 }, bolumBaslik: { color: '#ccc', fontWeight: '600', fontSize: 16, marginBottom: 12 },
-  progressBar: { height: 12, backgroundColor: '#0f3460', borderRadius: 6, marginBottom: 8, overflow: 'hidden' },
-  progressFill: { height: 12, backgroundColor: '#4caf50', borderRadius: 6 }, progressLabel: { color: '#666', fontSize: 13 },
-  konuKart: { backgroundColor: '#16213e', borderRadius: 12, padding: 14, marginBottom: 8, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderLeftWidth: 3, borderLeftColor: '#e94560' },
-  konuMetin: { color: '#ccc', fontSize: 13, flex: 1 },
+  container: { flex: 1, backgroundColor: C.bg },
+  content: { padding: 20, paddingTop: 60, paddingBottom: 48 },
+  pageTitle: { color: C.textPrimary, fontSize: F.xxl, fontWeight: '900', marginBottom: 4 },
+  pageSub: { color: C.textSecondary, fontSize: F.sm, marginBottom: 24 },
+  heroRow: { flexDirection: 'row', gap: 10, marginBottom: 28 },
+  heroKart: { flex: 1, backgroundColor: C.surface, borderRadius: R.lg, padding: 16, alignItems: 'center', borderWidth: 1 },
+  heroVal: { color: C.gold, fontSize: F.xxl, fontWeight: '900' },
+  heroLabel: { color: C.textMuted, fontSize: F.xs, marginTop: 4 },
+  sectionTitle: { color: C.textMuted, fontSize: F.xs, fontWeight: '700', letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 12, marginTop: 4 },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 24 },
+  statKart: { width: '47.5%', backgroundColor: C.surface, borderRadius: R.lg, padding: 16, borderWidth: 1, borderColor: C.border },
+  statVal: { fontSize: F.xxl, fontWeight: '900' },
+  statLabel: { color: C.textMuted, fontSize: F.xs, marginTop: 4 },
+  zayifKart: { flexDirection: 'row', alignItems: 'center', backgroundColor: C.surface, borderRadius: R.lg, padding: 14, marginBottom: 8, borderWidth: 1, borderColor: C.border, borderLeftWidth: 3, borderLeftColor: C.red },
+  zayifMetin: { flex: 1, color: C.textSecondary, fontSize: F.sm },
+  zayifBadge: { backgroundColor: C.redDim, borderRadius: R.full, paddingHorizontal: 10, paddingVertical: 4 },
+  zayifBadgeText: { color: C.red, fontWeight: '800', fontSize: F.xs },
+  bosKart: { backgroundColor: C.surface, borderRadius: R.lg, padding: 24, alignItems: 'center', borderWidth: 1, borderColor: C.border, marginBottom: 16 },
+  bosText: { color: C.textSecondary, fontSize: F.md, fontWeight: '700' },
+  bosAlt: { color: C.textMuted, fontSize: F.sm, marginTop: 6, textAlign: 'center' },
+  sesKart: { flexDirection: 'row', backgroundColor: C.surface, borderRadius: R.lg, padding: 14, marginBottom: 8, borderWidth: 1, borderColor: C.border },
+  sesBaslik: { color: C.textPrimary, fontWeight: '800', fontSize: F.md },
+  sesMeta: { color: C.textMuted, fontSize: F.xs, marginTop: 4 },
+  sesTarih: { color: C.textMuted, fontSize: F.xs, marginTop: 2 },
+  sesSkor: { alignItems: 'flex-end', justifyContent: 'center' },
+  sesSkorVal: { fontSize: F.xl, fontWeight: '900' },
+  sesKoma: { color: C.textMuted, fontSize: F.xs, marginTop: 2 },
 });

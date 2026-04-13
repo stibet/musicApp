@@ -1,15 +1,13 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Animated, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { C, F, R } from '../constants/Design';
 import { Soru, sorular } from '../src/data/sorular';
-import { useDilStore } from '../src/store/dilStore';
 import { cevapKaydet, tekrarSorulari } from '../src/store/progress';
 
 export default function QuizScreen() {
-  const { kategori } = useLocalSearchParams<{ kategori: string }>();
+  const { kategori } = useLocalSearchParams<{ kategori?: string }>();
   const router = useRouter();
-  const { tr, dil } = useDilStore();
-
   const [filtrelenmis, setFiltrelenmis] = useState<Soru[]>([]);
   const [yukleniyor, setYukleniyor] = useState(true);
   const [index, setIndex] = useState(0);
@@ -18,75 +16,63 @@ export default function QuizScreen() {
   const [bitti, setBitti] = useState(false);
   const [fadeAnim] = useState(new Animated.Value(1));
 
-  useEffect(() => { soruHazirla(); }, [kategori]);
+  useEffect(() => { yukle(); }, [kategori]);
 
-  async function soruHazirla() {
+  async function yukle() {
     setYukleniyor(true);
-    const tumSorular = sorular.filter(s => kategori === 'maqam' ? s.kategori === 'makam' : s.kategori === 'bati');
-    const tekrarIds = await tekrarSorulari(tumSorular.map(s => s.id));
-    setFiltrelenmis(tumSorular.filter(s => tekrarIds.includes(s.id)).sort(() => Math.random() - 0.5));
+    const tumSorular = kategori ? sorular.filter(s => kategori === 'maqam' ? s.kategori === 'makam' : s.kategori === 'bati') : sorular;
+    const ids = await tekrarSorulari(tumSorular.map(s => s.id));
+    setFiltrelenmis(tumSorular.filter(s => ids.includes(s.id)).sort(() => Math.random() - 0.5));
     setYukleniyor(false);
   }
 
-  function cevapSec(secenek: string) {
+  function sec(opt: string) {
     if (secilen) return;
-    setSecilen(secenek);
-    const dogruCevap = dil === 'en'
-      ? suankiSoru.seçeneklerEn[suankiSoru.secenekler.indexOf(suankiSoru.dogruCevap)]
-      : suankiSoru.dogruCevap;
-    const dogruMu = secenek === dogruCevap;
+    setSecilen(opt);
+    const dogruMu = opt === suankiSoru.dogruCevap;
     if (dogruMu) setDogru(d => d + 1);
     cevapKaydet(suankiSoru.id, dogruMu);
   }
 
   function sonraki() {
-    Animated.timing(fadeAnim, { toValue: 0, duration: 200, useNativeDriver: true }).start(() => {
+    Animated.timing(fadeAnim, { toValue: 0, duration: 150, useNativeDriver: true }).start(() => {
       if (index + 1 >= filtrelenmis.length) setBitti(true);
       else { setIndex(i => i + 1); setSecilen(null); }
-      Animated.timing(fadeAnim, { toValue: 1, duration: 200, useNativeDriver: true }).start();
+      Animated.timing(fadeAnim, { toValue: 1, duration: 150, useNativeDriver: true }).start();
     });
   }
 
-  if (yukleniyor) return (
-    <SafeAreaView style={s.container}><View style={s.ortala}><Text style={{ color: '#888' }}>...</Text></View></SafeAreaView>
-  );
+  if (yukleniyor) return <SafeAreaView style={s.container}><View style={s.ortala}><Text style={{ color: C.textMuted }}>Yükleniyor...</Text></View></SafeAreaView>;
 
   if (filtrelenmis.length === 0) return (
     <SafeAreaView style={s.container}>
       <View style={s.ortala}>
-        <Text style={{ fontSize: 48, marginBottom: 16 }}>🎉</Text>
-        <Text style={s.sonucBaslik}>{tr.harika}</Text>
-        <Text style={s.sonucMesaj}>{tr.bugunSoruKalmadi}</Text>
+        <Text style={{ fontSize: 56, marginBottom: 16 }}>🎉</Text>
+        <Text style={s.sonucBaslik}>Harika!</Text>
+        <Text style={s.sonucAlt}>Bugünlük tekrar edilecek soru kalmadı.</Text>
         <TouchableOpacity style={s.sonrakiBtn} onPress={() => router.back()}>
-          <Text style={s.sonrakiBtnText}>{tr.anaSayfayaDon}</Text>
+          <Text style={s.sonrakiBtnText}>Ana Sayfaya Dön</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
 
   const suankiSoru = filtrelenmis[index];
-  const soruMetni = dil === 'en' ? suankiSoru.soruEn : suankiSoru.soru;
-  const secenekListesi = dil === 'en' ? suankiSoru.seçeneklerEn : suankiSoru.secenekler;
-  const dogruCevap = dil === 'en'
-    ? suankiSoru.seçeneklerEn[suankiSoru.secenekler.indexOf(suankiSoru.dogruCevap)]
-    : suankiSoru.dogruCevap;
-  const aciklamaMetni = dil === 'en' ? suankiSoru.aciklamaEn : suankiSoru.aciklama;
 
   if (bitti) {
     const yuzde = Math.round((dogru / filtrelenmis.length) * 100);
     return (
       <SafeAreaView style={s.container}>
-        <View style={s.sonucContainer}>
+        <View style={s.ortala}>
           <Text style={{ fontSize: 72, marginBottom: 16 }}>{yuzde >= 80 ? '🏆' : yuzde >= 50 ? '👏' : '📚'}</Text>
-          <Text style={s.sonucBaslik}>{tr.tamamlandi}</Text>
-          <Text style={s.sonucSkor}>{dogru} / {filtrelenmis.length}</Text>
-          <Text style={s.sonucYuzde}>%{yuzde}</Text>
-          <Text style={s.sonucMesaj}>{yuzde >= 80 ? tr.harika : yuzde >= 50 ? tr.iyiGidiyor : tr.tekrarEt}</Text>
-          <TouchableOpacity style={s.tekrarBtn} onPress={() => { setIndex(0); setSecilen(null); setDogru(0); setBitti(false); soruHazirla(); }}>
-            <Text style={s.tekrarBtnText}>{tr.tekrarCoz}</Text>
+          <Text style={s.sonucBaslik}>Tamamlandı!</Text>
+          <Text style={[s.sonucSkor, { color: yuzde >= 70 ? C.green : yuzde >= 40 ? C.amber : C.red }]}>{dogru}/{filtrelenmis.length}</Text>
+          <Text style={{ color: C.textMuted, fontSize: F.md, marginBottom: 28 }}>%{yuzde} başarı</Text>
+          <TouchableOpacity style={s.sonrakiBtn} onPress={() => { setIndex(0); setSecilen(null); setDogru(0); setBitti(false); yukle(); }}>
+            <Text style={s.sonrakiBtnText}>Tekrar Çöz</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={s.geriBtn} onPress={() => router.back()}>
-            <Text style={s.geriBtnText}>{tr.anaSayfa}</Text>
+          <TouchableOpacity style={[s.sonrakiBtn, { backgroundColor: C.surface2, borderWidth: 1, borderColor: C.border, marginTop: 10 }]} onPress={() => router.back()}>
+            <Text style={[s.sonrakiBtnText, { color: C.textSecondary }]}>Ana Sayfa</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -95,44 +81,54 @@ export default function QuizScreen() {
 
   return (
     <SafeAreaView style={s.container}>
-      <View style={s.header}>
-        <TouchableOpacity onPress={() => router.back()}><Text style={s.geri}>{tr.geri}</Text></TouchableOpacity>
-        <Text style={s.progress}>{index + 1} / {filtrelenmis.length}</Text>
-        <Text style={s.skorText}>✓ {dogru}</Text>
+      <View style={s.quizHeader}>
+        <TouchableOpacity onPress={() => router.back()}><Text style={s.geri}>← Geri</Text></TouchableOpacity>
+        <Text style={s.quizProgress}>{index + 1} / {filtrelenmis.length}</Text>
+        <Text style={[s.geri, { color: C.green }]}>✓ {dogru}</Text>
       </View>
-      <View style={s.progressBar}>
-        <View style={[s.progressFill, { width: `${((index + 1) / filtrelenmis.length) * 100}%` }]} />
+      <View style={s.quizBar}>
+        <View style={[s.quizBarFill, { width: `${((index + 1) / filtrelenmis.length) * 100}%` }]} />
       </View>
-      <Animated.View style={[s.content, { opacity: fadeAnim }]}>
+
+      <Animated.View style={[s.quizContent, { opacity: fadeAnim }]}>
         <View style={s.zorlukRow}>
-          <Text style={s.kategoriTag}>{suankiSoru.kategori === 'makam' ? tr.turkMuzigi : tr.batiMuzigi}</Text>
-          <Text style={s.zorlukTag}>{'⭐'.repeat(suankiSoru.zorluk)}</Text>
+          <View style={[s.kategoriTag, { backgroundColor: suankiSoru.kategori === 'makam' ? C.goldGlow : C.tealGlow }]}>
+            <Text style={[s.kategoriTagText, { color: suankiSoru.kategori === 'makam' ? C.gold : C.teal }]}>
+              {suankiSoru.kategori === 'makam' ? 'Türk Müziği' : 'Batı Müziği'}
+            </Text>
+          </View>
+          <Text style={s.zorluk}>{'⭐'.repeat(suankiSoru.zorluk)}</Text>
         </View>
-        <Text style={s.soruText}>{soruMetni}</Text>
+
+        <Text style={s.soruText}>{suankiSoru.soru}</Text>
+
         <View style={s.secenekler}>
-          {secenekListesi.map((opt) => {
+          {suankiSoru.secenekler.map(opt => {
             let stil = s.secenek;
             if (secilen) {
-              if (opt === dogruCevap) stil = { ...s.secenek, ...s.dogruSecenek };
-              else if (opt === secilen) stil = { ...s.secenek, ...s.yanlisSecenek };
+              if (opt === suankiSoru.dogruCevap) stil = { ...s.secenek, ...s.dogruSec };
+              else if (opt === secilen) stil = { ...s.secenek, ...s.yanlisSec };
             }
             return (
-              <TouchableOpacity key={opt} style={stil} onPress={() => cevapSec(opt)}>
+              <TouchableOpacity key={opt} style={stil} onPress={() => sec(opt)} activeOpacity={0.8}>
                 <Text style={s.secenekText}>{opt}</Text>
+                {secilen && opt === suankiSoru.dogruCevap && <Text style={{ color: C.green, fontSize: F.xs, marginTop: 4 }}>✓ Doğru</Text>}
+                {secilen && opt === secilen && opt !== suankiSoru.dogruCevap && <Text style={{ color: C.red, fontSize: F.xs, marginTop: 4 }}>✗ Yanlış</Text>}
               </TouchableOpacity>
             );
           })}
         </View>
+
         {secilen && (
-          <View style={[s.aciklamaBox, { borderLeftColor: secilen === dogruCevap ? '#4caf50' : '#e94560' }]}>
-            <Text style={s.aciklamaBaslik}>{secilen === dogruCevap ? `✅ ${tr.dogru}!` : `❌ ${tr.yanlis}!`}</Text>
-            <Text style={s.aciklamaText}>{aciklamaMetni}</Text>
+          <View style={[s.aciklama, { borderLeftColor: secilen === suankiSoru.dogruCevap ? C.green : C.red }]}>
+            <Text style={s.aciklamaText}>{suankiSoru.aciklama}</Text>
           </View>
         )}
       </Animated.View>
+
       {secilen && (
         <TouchableOpacity style={s.sonrakiBtn} onPress={sonraki}>
-          <Text style={s.sonrakiBtnText}>{index + 1 >= filtrelenmis.length ? tr.sonuclariGor : tr.sonrakiSoru}</Text>
+          <Text style={s.sonrakiBtnText}>{index + 1 >= filtrelenmis.length ? 'Sonuçları Gör →' : 'Sonraki Soru →'}</Text>
         </TouchableOpacity>
       )}
     </SafeAreaView>
@@ -140,34 +136,29 @@ export default function QuizScreen() {
 }
 
 const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#1a1a2e' },
+  container: { flex: 1, backgroundColor: C.bg },
   ortala: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 32 },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16 },
-  geri: { color: '#888', fontSize: 16 }, progress: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
-  skorText: { color: '#4caf50', fontWeight: 'bold', fontSize: 16 },
-  progressBar: { height: 4, backgroundColor: '#16213e', marginHorizontal: 16, borderRadius: 2 },
-  progressFill: { height: 4, backgroundColor: '#e94560', borderRadius: 2 },
-  content: { flex: 1, padding: 20 },
-  zorlukRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 16 },
-  kategoriTag: { color: '#888', fontSize: 13 }, zorlukTag: { fontSize: 13 },
-  soruText: { fontSize: 22, fontWeight: 'bold', color: '#fff', marginBottom: 28, lineHeight: 32 },
-  secenekler: { gap: 12 },
-  secenek: { backgroundColor: '#16213e', borderRadius: 12, padding: 16, borderWidth: 1, borderColor: '#0f3460' },
-  dogruSecenek: { backgroundColor: '#1b3a1f', borderColor: '#4caf50' },
-  yanlisSecenek: { backgroundColor: '#3a1b1f', borderColor: '#e94560' },
-  secenekText: { color: '#fff', fontSize: 16 },
-  aciklamaBox: { marginTop: 20, backgroundColor: '#16213e', borderRadius: 12, padding: 16, borderLeftWidth: 4 },
-  aciklamaBaslik: { color: '#fff', fontWeight: 'bold', fontSize: 16, marginBottom: 8 },
-  aciklamaText: { color: '#aaa', fontSize: 14, lineHeight: 22 },
-  sonrakiBtn: { margin: 16, backgroundColor: '#e94560', borderRadius: 12, padding: 18, alignItems: 'center' },
-  sonrakiBtnText: { color: '#fff', fontWeight: 'bold', fontSize: 18 },
-  sonucContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 32 },
-  sonucBaslik: { fontSize: 24, fontWeight: 'bold', color: '#fff', marginBottom: 8, textAlign: 'center' },
-  sonucSkor: { fontSize: 48, fontWeight: 'bold', color: '#e94560', marginBottom: 4 },
-  sonucYuzde: { fontSize: 20, color: '#888', marginBottom: 16 },
-  sonucMesaj: { fontSize: 15, color: '#ccc', textAlign: 'center', marginBottom: 32 },
-  tekrarBtn: { backgroundColor: '#e94560', borderRadius: 12, padding: 16, width: '100%', alignItems: 'center', marginBottom: 12 },
-  tekrarBtnText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
-  geriBtn: { backgroundColor: '#16213e', borderRadius: 12, padding: 16, width: '100%', alignItems: 'center' },
-  geriBtnText: { color: '#888', fontSize: 16 },
+  quizHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, paddingTop: 56 },
+  geri: { color: C.textSecondary, fontSize: F.md, fontWeight: '600' },
+  quizProgress: { color: C.textPrimary, fontWeight: '800', fontSize: F.md },
+  quizBar: { height: 3, backgroundColor: C.border, marginHorizontal: 16, borderRadius: 2 },
+  quizBarFill: { height: 3, backgroundColor: C.gold, borderRadius: 2 },
+  quizContent: { flex: 1, padding: 20 },
+  zorlukRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
+  kategoriTag: { borderRadius: R.full, paddingHorizontal: 12, paddingVertical: 6 },
+  kategoriTagText: { fontSize: F.xs, fontWeight: '700' },
+  zorluk: { fontSize: F.sm },
+  soruText: { fontSize: F.lg + 2, fontWeight: '800', color: C.textPrimary, marginBottom: 24, lineHeight: 28 },
+  secenekler: { gap: 10 },
+  secenek: { backgroundColor: C.surface, borderRadius: R.lg, padding: 16, borderWidth: 1, borderColor: C.border },
+  dogruSec: { backgroundColor: C.greenDim, borderColor: C.green },
+  yanlisSec: { backgroundColor: C.redDim, borderColor: C.red },
+  secenekText: { color: C.textPrimary, fontSize: F.md, fontWeight: '600' },
+  aciklama: { marginTop: 16, backgroundColor: C.surface, borderRadius: R.lg, padding: 16, borderLeftWidth: 3 },
+  aciklamaText: { color: C.textSecondary, fontSize: F.sm, lineHeight: 20 },
+  sonucBaslik: { fontSize: F.xxl, fontWeight: '900', color: C.textPrimary, marginBottom: 8 },
+  sonucSkor: { fontSize: 56, fontWeight: '900', marginBottom: 4 },
+  sonucAlt: { color: C.textMuted, fontSize: F.md, textAlign: 'center', marginBottom: 28 },
+  sonrakiBtn: { margin: 16, backgroundColor: C.gold, borderRadius: R.lg, padding: 18, alignItems: 'center' },
+  sonrakiBtnText: { color: C.bg, fontWeight: '900', fontSize: F.md },
 });
