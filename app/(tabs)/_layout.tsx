@@ -5,7 +5,7 @@ import { C } from '../../constants/Design';
 function TabIcon({ emoji, label, focused }: { emoji: string; label: string; focused: boolean }) {
   return (
     <View style={{ alignItems: 'center', paddingTop: 4 }}>
-      <Text style={{ fontSize: 20, opacity: focused ? 1 : 0.45 }}>{emoji}</Text>
+      <Text style={{ fontSize: 20, opacity: focused ? 1 : 0.4 }}>{emoji}</Text>
       <Text style={{ fontSize: 10, color: focused ? C.gold : C.textMuted, fontWeight: focused ? '700' : '400', marginTop: 2 }}>
         {label}
       </Text>
@@ -29,8 +29,8 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen name="index" options={{ tabBarIcon: ({ focused }) => <TabIcon emoji="🎵" label="Koç" focused={focused} /> }} />
-      <Tabs.Screen name="two" options={{ tabBarIcon: ({ focused }) => <TabIcon emoji="🎤" label="Analiz" focused={focused} /> }} />
-      <Tabs.Screen name="progress" options={{ tabBarIcon: ({ focused }) => <TabIcon emoji="📊" label="Rapor" focused={focused} /> }} />
+      <Tabs.Screen name="two"   options={{ tabBarIcon: ({ focused }) => <TabIcon emoji="🎤" label="Analiz" focused={focused} /> }} />
+      <Tabs.Screen name="progress" options={{ href: null }} />
     </Tabs>
   );
 }

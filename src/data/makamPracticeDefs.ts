@@ -69,7 +69,7 @@ const defs: Record<string, MakamPracticeDef> = {
     steps: [
       { degreeIndex: 0, turkish: 'Sol', western: 'G', midi: 'G3', role: 'karar' },
       { degreeIndex: 1, turkish: 'La', western: 'A', midi: 'A3' },
-      { degreeIndex: 2, turkish: 'Si koma♭', western: 'Bb~', midi: 'A#3' },
+      { degreeIndex: 2, turkish: 'Si koma♭', western: 'B~', midi: 'B3' },
       { degreeIndex: 3, turkish: 'Do', western: 'C', midi: 'C4' },
       { degreeIndex: 4, turkish: 'Re', western: 'D', midi: 'D4', role: 'guclu' },
       { degreeIndex: 5, turkish: 'Mi', western: 'E', midi: 'E4' },
@@ -87,7 +87,7 @@ const defs: Record<string, MakamPracticeDef> = {
     tonicHz: 220,
     steps: [
       { degreeIndex: 0, turkish: 'La', western: 'A', midi: 'A3', role: 'karar' },
-      { degreeIndex: 1, turkish: 'Si koma♭', western: 'Bb~', midi: 'A#3' },
+      { degreeIndex: 1, turkish: 'Si koma♭', western: 'B~', midi: 'B3' },
       { degreeIndex: 2, turkish: 'Do', western: 'C', midi: 'C4' },
       { degreeIndex: 3, turkish: 'Re', western: 'D', midi: 'D4', role: 'guclu' },
       { degreeIndex: 4, turkish: 'Mi', western: 'E', midi: 'E4' },

@@ -1,209 +1,156 @@
-// Web Audio sentez motoru
-// Tone.js ile her enstrüman için farklı ses karakteri
+// sesMotoru.ts — Aşama A (Web / Tone.js)
+// Cent offset desteği: makamEngine'den gelen detune değerini
+// Tone.js Sampler'a uygular. Bu sayede mikrotonal perdeler
+// doğru frekansla çalınır.
+//
+// Aşama B (Mac): Bu dosya yerini AVAudioUnitSampler bridge'ine bırakacak.
 
 import { Platform } from 'react-native';
+import { instrumentPacks, InstrumentId } from './instrumentPacks';
 
 let toneLoaded = false;
 let Tone: any = null;
-let synths: Record<string, any> = {};
-let reverb: any = null;
-let compressor: any = null;
+const synths: Record<string, any> = {};
+let reverb: any  = null;
+let comp: any    = null;
 
 export async function sesMotorBaslat(): Promise<void> {
-  if (Platform.OS !== 'web') return;
-  if (toneLoaded) return;
-
+  if (Platform.OS !== 'web' || toneLoaded) return;
   try {
     Tone = await import('tone');
     await Tone.start();
-
-    // Efektler
-    compressor = new Tone.Compressor(-30, 3).toDestination();
-    reverb = new Tone.Reverb({ decay: 1.5, wet: 0.2 }).connect(compressor);
+    comp   = new Tone.Compressor(-24, 4).toDestination();
+    reverb = new Tone.Reverb({ decay: 1.8, wet: 0.2 }).connect(comp);
     await reverb.ready;
 
-    // Piyano - sampler (Salamander Grand Piano CDN)
-    synths['piano'] = new Tone.Sampler({
-      urls: {
-        A0: 'A0.mp3', C1: 'C1.mp3', 'D#1': 'Ds1.mp3', 'F#1': 'Fs1.mp3',
-        A1: 'A1.mp3', C2: 'C2.mp3', 'D#2': 'Ds2.mp3', 'F#2': 'Fs2.mp3',
-        A2: 'A2.mp3', C3: 'C3.mp3', 'D#3': 'Ds3.mp3', 'F#3': 'Fs3.mp3',
-        A3: 'A3.mp3', C4: 'C4.mp3', 'D#4': 'Ds4.mp3', 'F#4': 'Fs4.mp3',
-        A4: 'A4.mp3', C5: 'C5.mp3', 'D#5': 'Ds5.mp3', 'F#5': 'Fs5.mp3',
-        A5: 'A5.mp3', C6: 'C6.mp3', 'D#6': 'Ds6.mp3', 'F#6': 'Fs6.mp3',
-        A6: 'A6.mp3', C7: 'C7.mp3', 'D#7': 'Ds7.mp3', 'F#7': 'Fs7.mp3',
-        A7: 'A7.mp3', C8: 'C8.mp3',
-      },
-      baseUrl: 'https://tonejs.github.io/audio/salamander/',
-      onload: () => console.log('Piyano yüklendi'),
-    }).connect(reverb);
+    // Her enstrümanı pack tanımından yükle
+    for (const [id, pack] of Object.entries(instrumentPacks)) {
+      if (id === 'ney' || id === 'ud' || id === 'guitar' || id === 'baglama') {
+        // Telli/nefes: PluckSynth veya özel sentez (CDN sample az)
+        if (id === 'ud' || id === 'baglama') {
+          synths[id] = new Tone.PluckSynth({
+            attackNoise: id === 'ud' ? 0.8 : 1.4,
+            dampening:   id === 'ud' ? 3200 : 4200,
+            resonance:   id === 'ud' ? 0.97 : 0.94,
+          }).connect(reverb);
+        } else if (id === 'guitar') {
+          synths[id] = new Tone.PluckSynth({ attackNoise: 1.2, dampening: 3800, resonance: 0.96 }).connect(reverb);
+        } else {
+          // Ney — sine + yavaş attack
+          synths[id] = new Tone.Synth({
+            oscillator: { type: 'sine' },
+            envelope: { attack: 0.3, decay: 0.05, sustain: 0.88, release: 1.0 },
+          }).connect(reverb);
+          synths['ney_harm'] = new Tone.Synth({
+            oscillator: { type: 'sine' },
+            envelope: { attack: 0.4, decay: 0.05, sustain: 0.5, release: 1.0 },
+            volume: -18,
+          }).connect(reverb);
+        }
+        continue;
+      }
 
-    // Gitar - sentez
-    synths['guitar'] = new Tone.PluckSynth({
-      attackNoise: 1,
-      dampening: 4000,
-      resonance: 0.95,
-    }).connect(reverb);
-
-    // Bas gitar
-    synths['bass'] = new Tone.MonoSynth({
-      oscillator: { type: 'sawtooth' },
-      envelope: { attack: 0.02, decay: 0.1, sustain: 0.8, release: 0.5 },
-      filterEnvelope: { attack: 0.02, decay: 0.1, sustain: 0.5, release: 0.5, baseFrequency: 200, octaves: 2 },
-    }).connect(compressor);
-
-    // Keman - sentez
-    synths['violin'] = new Tone.FMSynth({
-      harmonicity: 3.01,
-      modulationIndex: 14,
-      oscillator: { type: 'triangle' },
-      envelope: { attack: 0.2, decay: 0.3, sustain: 0.9, release: 0.8 },
-      modulation: { type: 'square' },
-      modulationEnvelope: { attack: 0.2, decay: 0.3, sustain: 0.9, release: 0.8 },
-    }).connect(reverb);
-
-    // Ney - sentez (flüt benzeri)
-    synths['ney'] = new Tone.Synth({
-      oscillator: { type: 'sine' },
-      envelope: { attack: 0.3, decay: 0.1, sustain: 0.9, release: 0.8 },
-    }).connect(reverb);
-
-    // Bağlama - pluck
-    synths['baglama'] = new Tone.PluckSynth({
-      attackNoise: 2,
-      dampening: 3000,
-      resonance: 0.92,
-    }).connect(reverb);
-
-    // Ud - sentez
-    synths['ud'] = new Tone.PluckSynth({
-      attackNoise: 1.5,
-      dampening: 2500,
-      resonance: 0.9,
-    }).connect(reverb);
-
-    // Davul - Membrane + Metal sentez
-    synths['drums_kick'] = new Tone.MembraneSynth({
-      pitchDecay: 0.05,
-      octaves: 6,
-      envelope: { attack: 0.001, decay: 0.4, sustain: 0, release: 0.1 },
-    }).connect(compressor);
-
-    synths['drums_snare'] = new Tone.NoiseSynth({
-      noise: { type: 'white' },
-      envelope: { attack: 0.001, decay: 0.2, sustain: 0, release: 0.1 },
-    }).connect(compressor);
-
-    synths['drums_hihat'] = new Tone.MetalSynth({
-      frequency: 400,
-      envelope: { attack: 0.001, decay: 0.1, release: 0.01 },
-      harmonicity: 5.1,
-      modulationIndex: 32,
-      resonance: 4000,
-      octaves: 1.5,
-    }).connect(compressor);
-
-    synths['drums_hihat_open'] = new Tone.MetalSynth({
-      frequency: 400,
-      envelope: { attack: 0.001, decay: 0.4, release: 0.1 },
-      harmonicity: 5.1,
-      modulationIndex: 32,
-      resonance: 4000,
-      octaves: 1.5,
-    }).connect(compressor);
-
-    synths['drums_tom1'] = new Tone.MembraneSynth({
-      pitchDecay: 0.05,
-      octaves: 4,
-      envelope: { attack: 0.001, decay: 0.3, sustain: 0, release: 0.1 },
-    }).connect(compressor);
-
-    synths['drums_tom2'] = new Tone.MembraneSynth({
-      pitchDecay: 0.05,
-      octaves: 3,
-      envelope: { attack: 0.001, decay: 0.3, sustain: 0, release: 0.1 },
-    }).connect(compressor);
-
-    synths['drums_crash'] = new Tone.MetalSynth({
-      frequency: 300,
-      envelope: { attack: 0.001, decay: 1.0, release: 0.3 },
-      harmonicity: 5.1,
-      modulationIndex: 32,
-      resonance: 3000,
-      octaves: 1.5,
-    }).connect(reverb);
-
-    synths['drums_ride'] = new Tone.MetalSynth({
-      frequency: 440,
-      envelope: { attack: 0.001, decay: 0.6, release: 0.2 },
-      harmonicity: 5.1,
-      modulationIndex: 32,
-      resonance: 3500,
-      octaves: 1.5,
-    }).connect(reverb);
-
-    // Trompet
-    synths['trumpet'] = new Tone.Synth({
-      oscillator: { type: 'sawtooth' },
-      envelope: { attack: 0.05, decay: 0.1, sustain: 0.8, release: 0.3 },
-    }).connect(reverb);
-
-    // Flüt
-    synths['flute'] = new Tone.Synth({
-      oscillator: { type: 'sine' },
-      envelope: { attack: 0.1, decay: 0.1, sustain: 0.9, release: 0.5 },
-    }).connect(reverb);
-
-    toneLoaded = true;
-    console.log('Ses motoru hazır');
-  } catch (e) {
-    console.error('Ses motoru hatası:', e);
-  }
-}
-
-export function notaCal(enstrumanId: string, nota: string, sure: string = '8n'): void {
-  if (Platform.OS !== 'web' || !toneLoaded || !Tone) return;
-
-  try {
-    if (enstrumanId === 'drums') {
-      davulCal(nota);
-      return;
+      // Sampler — gerçek MP3 kayıtlar
+      synths[id] = new Tone.Sampler({
+        urls:    pack.notalar,
+        baseUrl: pack.cdnBaseUrl,
+        onload:  () => console.log(`${id} yüklendi ✓`),
+        onerror: (e: any) => console.warn(`${id} yükleme uyarısı:`, e),
+      }).connect(reverb);
     }
 
+    // Davul
+    synths['drums_kick']  = new Tone.MembraneSynth({ pitchDecay: 0.06, octaves: 8, envelope: { attack: 0.001, decay: 0.5, sustain: 0, release: 0.1 } }).connect(comp);
+    synths['drums_snare'] = new Tone.NoiseSynth({ noise: { type: 'white' }, envelope: { attack: 0.001, decay: 0.18, sustain: 0, release: 0.08 } }).connect(comp);
+    synths['drums_hihat'] = new Tone.MetalSynth({ frequency: 400, envelope: { attack: 0.001, decay: 0.08, release: 0.01 }, harmonicity: 5.1, modulationIndex: 32, resonance: 4000, octaves: 1.5 }).connect(comp);
+
+    toneLoaded = true;
+  } catch (e) { console.error('Ses motoru hatası:', e); }
+}
+
+// ── TEMEL NOTA ÇALMA ──────────────────────────────────────────────
+
+export function notaCal(enstrumanId: string, nota: string, sure: string = '8n'): void {
+  if (Platform.OS !== 'web' || !Tone) return;
+  if (enstrumanId === 'drums') { davulCal(nota); return; }
+  try {
+    const synth = synths[enstrumanId];
+    if (!synth) return;
+    if (enstrumanId === 'ney') {
+      synth.triggerAttackRelease(nota, sure);
+      try {
+        const oct = parseInt(nota.match(/(\d+)$/)?.[1] || '5');
+        synths['ney_harm']?.triggerAttackRelease(nota.replace(/\d+$/, String(oct + 1)), sure);
+      } catch {}
+      return;
+    }
+    if (['ud', 'baglama', 'guitar'].includes(enstrumanId)) {
+      synth.triggerAttack(nota);
+      return;
+    }
+    synth.triggerAttackRelease(nota, sure);
+  } catch (e) { console.error('notaCal hatası:', e, nota); }
+}
+
+// ── CENT OFFSET İLE NOTA ÇALMA (mikrotonal) ───────────────────────
+// Tone.js Sampler detune parametresi cent cinsinden offset alır.
+// Bu fonksiyon makam perdesini doğru mikrotonal frekansla çalar.
+
+export function notaCalCent(
+  enstrumanId: string,
+  nota: string,         // MIDI nota adı (en yakın standart nota)
+  centOffset: number,   // cent offset (+ = tiz, - = pest)
+  sure: string = '4n',
+): void {
+  if (Platform.OS !== 'web' || !Tone) return;
+  try {
     const synth = synths[enstrumanId];
     if (!synth) return;
 
-    if (enstrumanId === 'guitar' || enstrumanId === 'baglama' || enstrumanId === 'ud') {
-      synth.triggerAttack(nota);
+    // Telli enstrümanlar için detune desteği
+    if (['ud', 'baglama', 'guitar'].includes(enstrumanId)) {
+      // PluckSynth'te detune yok, yaklaşık frekans hesapla
+      const baseHz = Tone.Frequency(nota).toFrequency();
+      const gercekHz = baseHz * Math.pow(2, centOffset / 1200);
+      synth.triggerAttack(gercekHz);
+      return;
+    }
+
+    // Sampler'da detune parametresi var
+    if (synth.detune !== undefined) {
+      const mevcutDetune = synth.detune.value;
+      synth.detune.value = centOffset;
+      synth.triggerAttackRelease(nota, sure);
+      // Kısa gecikme sonra sıfırla
+      setTimeout(() => {
+        if (synth.detune) synth.detune.value = 0;
+      }, 1000);
     } else {
+      // Detune desteklenmiyor, standart çal
       synth.triggerAttackRelease(nota, sure);
     }
-  } catch (e) {
-    console.error('Nota çalma hatası:', e, nota);
-  }
+  } catch (e) { console.error('notaCalCent hatası:', e); }
 }
 
-export function notaBirak(enstrumanId: string, nota: string): void {
+export function notaBirak(enstrumanId: string, _nota: string): void {
   if (Platform.OS !== 'web' || !toneLoaded) return;
-  if (enstrumanId === 'guitar' || enstrumanId === 'baglama' || enstrumanId === 'ud') {
-    const synth = synths[enstrumanId];
-    if (synth && synth.releaseAll) synth.releaseAll();
+  if (['ud', 'baglama', 'guitar'].includes(enstrumanId)) {
+    synths[enstrumanId]?.releaseAll?.();
   }
 }
 
 function davulCal(nota: string): void {
-  switch (nota) {
-    case 'C2': synths['drums_kick']?.triggerAttackRelease('C1', '8n'); break;
-    case 'D2': synths['drums_snare']?.triggerAttackRelease('8n'); break;
-    case 'F#2': synths['drums_hihat']?.triggerAttackRelease('32n'); break;
-    case 'A#2': synths['drums_hihat_open']?.triggerAttackRelease('8n'); break;
-    case 'A2': synths['drums_tom1']?.triggerAttackRelease('E2', '8n'); break;
-    case 'B2': synths['drums_tom2']?.triggerAttackRelease('C2', '8n'); break;
-    case 'C#3': synths['drums_crash']?.triggerAttackRelease('16n'); break;
-    case 'D#3': synths['drums_ride']?.triggerAttackRelease('16n'); break;
-  }
+  const m: Record<string, () => void> = {
+    'C2':  () => synths['drums_kick']?.triggerAttackRelease('C1', '8n'),
+    'D2':  () => synths['drums_snare']?.triggerAttackRelease('8n'),
+    'F#2': () => synths['drums_hihat']?.triggerAttackRelease('32n'),
+    'A2':  () => synths['drums_hihat']?.triggerAttackRelease('16n'),
+    'B2':  () => synths['drums_kick']?.triggerAttackRelease('C1', '16n'),
+    'E2':  () => synths['drums_snare']?.triggerAttackRelease('16n'),
+    'G2':  () => synths['drums_hihat']?.triggerAttackRelease('8n'),
+    'C3':  () => synths['drums_kick']?.triggerAttackRelease('G0', '8n'),
+  };
+  m[nota]?.();
 }
 
-export function isSesMotorHazir(): boolean {
-  return toneLoaded;
-}
+export function isSesMotorHazir(): boolean { return toneLoaded; }

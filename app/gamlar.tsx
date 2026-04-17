@@ -1,7 +1,7 @@
 import { useRouter } from 'expo-router';
 import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { C, F, R } from '../constants/Design';
-import { batıGamları } from '../src/data/batıgamları';
+import { batıGamları } from '../src/data/westernScales';
 
 const TIP_RENK: Record<string, string> = { major: C.green, minor: C.red, mod: C.violet, pentatonik: C.amber };
 const TIP_ISIM: Record<string, string> = { major: 'Majör', minor: 'Minör', mod: 'Mod', pentatonik: 'Pentatonik' };

@@ -7,7 +7,6 @@ import { C } from '../constants/Design';
 
 export { ErrorBoundary } from 'expo-router';
 export const unstable_settings = { initialRouteName: '(tabs)' };
-
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -24,6 +23,11 @@ export default function RootLayout() {
       <Stack.Screen name="(tabs)" />
       <Stack.Screen name="makam-kocu" />
       <Stack.Screen name="quiz" />
+      <Stack.Screen name="taksim-analiz" />
+      <Stack.Screen name="video-analiz" />
+      <Stack.Screen name="egzersizler" />
+      <Stack.Screen name="debug" />
+      <Stack.Screen name="debug-lab" />
       <Stack.Screen name="makamlar" />
       <Stack.Screen name="makam-detay" />
       <Stack.Screen name="gamlar" />
