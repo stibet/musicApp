@@ -1,22 +1,58 @@
 // playbackInterface.ts
 // Tüm ses çalma buradan geçer.
-// IAudioEngine interface'ini implement eder.
-// Şimdi: Tone.js CDN (web preview)
-// Sonra: Native modül gelince sadece bu dosya değişir.
+// Platform.OS === 'web'  → Tone.js CDN (Aşama A)
+// Platform.OS === 'ios'  → AVAudioUnitSampler native (Aşama B, ~5ms)
 
 import { Platform } from 'react-native';
 import type { SeyirCumlesi } from '../makam/makamDef';
 import { getMakamDef } from '../makam/makamDef';
 
-// Alttaki motoru lazy import et
-let _sesMotoru: any = null;
+// ── Motor soyutlaması ─────────────────────────────────────────────
 
-async function getSesMotoru() {
-  if (!_sesMotoru && Platform.OS === 'web') {
-    _sesMotoru = await import('./sesMotoru');
-    await _sesMotoru.sesMotorBaslat();
+interface AudioMotor {
+  notaCalCent(id: string, nota: string, centOffset: number, sure: string): void;
+  notaCal?(id: string, nota: string, sure: string): void;
+}
+
+let _motor: AudioMotor | null = null;
+
+async function getMotor(): Promise<AudioMotor | null> {
+  if (_motor) return _motor;
+
+  if (Platform.OS === 'ios') {
+    const native = await import('./nativeAudio');
+    await native.nativeMotorBaslat();
+    _motor = {
+      notaCalCent(id, nota, centOffset, sure) {
+        const ms = sureToMs(sure);
+        native.nativeNotaCalCent(id, nota, centOffset, ms);
+      },
+      notaCal(id, nota, sure) {
+        const ms = sureToMs(sure);
+        native.nativeNotaCal(id, nota, ms);
+      },
+    };
+  } else if (Platform.OS === 'web') {
+    const web = await import('./sesMotoru');
+    await web.sesMotorBaslat();
+    _motor = {
+      notaCalCent: web.notaCalCent,
+      notaCal:     web.notaCal,
+    };
   }
-  return _sesMotoru;
+
+  return _motor;
+}
+
+// Basit süre → ms dönüşümü (BPM 70 varsayımı)
+function sureToMs(sure: string): number {
+  const map: Record<string, number> = { '1n': 3428, '2n': 1714, '4n': 857, '8n': 428, '16n': 214 };
+  return map[sure] ?? 700;
+}
+
+// ── Eski getSesMotoru uyumluluğu ─────────────────────────────────
+async function getSesMotoru() {
+  return getMotor();
 }
 
 // MIDI adından MIDI numarası
@@ -47,7 +83,6 @@ export async function calDerece(
   semitones = 0,
   sure = '4n',
 ): Promise<void> {
-  if (Platform.OS !== 'web') return;
   const makam = getMakamDef(makamId);
   if (!makam) return;
   const derece = makam.dereceler[dereceIndex];
@@ -66,7 +101,6 @@ export async function playReferenceNote(
   semitones = 0,
   centOffset = 0,
 ): Promise<void> {
-  if (Platform.OS !== 'web') return;
   const motor = await getSesMotoru();
   if (!motor) return;
   const transposed = transpoze(midi, semitones);
@@ -83,7 +117,6 @@ export async function calDiziAsync(
   semitones = 0,
   onStep?: (index: number) => void,
 ): Promise<void> {
-  if (Platform.OS !== 'web') return;
   const makam = getMakamDef(makamId);
   if (!makam) return;
   const motor = await getSesMotoru();
@@ -109,7 +142,6 @@ export async function playReferenceSequence(
   semitones = 0,
   makamId?: string,
 ): Promise<void> {
-  if (Platform.OS !== 'web') return;
   const motor = await getSesMotoru();
   if (!motor) return;
 
@@ -132,7 +164,6 @@ export async function calSeyirCumlesi(
   tempo = 65,
   semitones = 0,
 ): Promise<void> {
-  if (Platform.OS !== 'web') return;
   const makam = getMakamDef(makamId);
   if (!makam) return;
   const cumle = makam.seyirCumleleri.find(c => c.tip === cumleTip)

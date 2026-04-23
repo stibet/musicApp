@@ -1,0 +1,7 @@
+{
+  "name": "makam-audio",
+  "version": "1.0.0",
+  "description": "Native AVAudioEngine bridge for microtonal Makam audio",
+  "main": "./index.ts",
+  "types": "./index.ts"
+}

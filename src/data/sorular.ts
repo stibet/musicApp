@@ -1,122 +1,154 @@
+// sorular.ts — 100 Soru
+// Kategoriler: makam, bati, teori, perde
+// Zorluk: 1 (kolay), 2 (orta), 3 (ileri)
+
 export type SoruTipi = 'coktan-secmeli';
+export type SoruKategori = 'makam' | 'bati' | 'teori' | 'perde';
+
 export interface Soru {
-  id: string; tip: SoruTipi; kategori: 'makam' | 'bati'; zorluk: 1 | 2 | 3;
-  soru: string; soruEn: string; secenekler: string[]; seçeneklerEn: string[];
-  dogruCevap: string; aciklama: string; aciklamaEn: string;
+  id: string;
+  tip: SoruTipi;
+  kategori: SoruKategori;
+  zorluk: 1 | 2 | 3;
+  soru: string;
+  secenekler: string[];
+  dogruCevap: string;
+  aciklama: string;
+  makamId?: string; // hangi makama özel (yoksa genel)
 }
+
 export const sorular: Soru[] = [
-  { id: 'q1', tip: 'coktan-secmeli', kategori: 'makam', zorluk: 1,
-    soru: 'Rast makamının durağı hangi perdedir?', soruEn: 'What is the tonic of the Rast maqam?',
-    secenekler: ['Sol', 'La', 'Re', 'Do'], seçeneklerEn: ['G', 'A', 'D', 'C'], dogruCevap: 'Sol',
-    aciklama: 'Rast makamı Sol perdesinde durur. Neşeli ve huzurlu karakteriyle bilinir.',
-    aciklamaEn: 'Rast maqam rests on G. Known for its joyful and peaceful character.' },
-  { id: 'q2', tip: 'coktan-secmeli', kategori: 'makam', zorluk: 1,
-    soru: 'Hicaz makamının karakteristik özelliği nedir?', soruEn: 'What characterizes the Hijaz maqam?',
-    secenekler: ['Arttırılmış ikili aralık içerir', 'Sadece tam seslerden oluşur', 'Pentatonik yapıya sahiptir', 'Majör karakterlidir'],
-    seçeneklerEn: ['Contains an augmented second', 'Only whole tones', 'Pentatonic structure', 'Major character'],
-    dogruCevap: 'Arttırılmış ikili aralık içerir',
-    aciklama: 'Hicaz makamının en belirgin özelliği 2. ve 3. dereceler arasındaki arttırılmış ikili aralığıdır.',
-    aciklamaEn: 'The most distinctive feature of Hijaz is the augmented second between the 2nd and 3rd degrees.' },
-  { id: 'q3', tip: 'coktan-secmeli', kategori: 'makam', zorluk: 1,
-    soru: 'Türk müziğinde bir tam ses kaç komadan oluşur?', soruEn: 'How many commas make up a whole tone?',
-    secenekler: ['9', '8', '5', '4'], seçeneklerEn: ['9', '8', '5', '4'], dogruCevap: '9',
-    aciklama: 'AEU sistemine göre bir tam ses 9 komadır.', aciklamaEn: 'According to AEU system, one whole tone equals 9 commas.' },
-  { id: 'q4', tip: 'coktan-secmeli', kategori: 'makam', zorluk: 1,
-    soru: 'Nihavend makamı hangi Batı moduna en yakındır?', soruEn: 'Which Western mode is Nihavend closest to?',
-    secenekler: ['Doğal Minör', 'Majör', 'Frigyen', 'Dorian'], seçeneklerEn: ['Natural Minor', 'Major', 'Phrygian', 'Dorian'],
-    dogruCevap: 'Doğal Minör',
-    aciklama: 'Nihavend, Batı müziğindeki doğal minöre en yakın makamdır.', aciklamaEn: 'Nihavend is closest to the Western natural minor scale.' },
-  { id: 'q5', tip: 'coktan-secmeli', kategori: 'makam', zorluk: 1,
-    soru: 'Mahur makamı hangi Batı gamına benzer?', soruEn: 'Which Western scale does Mahur resemble?',
-    secenekler: ['Majör Gam', 'Minör Gam', 'Frigyen Mod', 'Blues Gamı'], seçeneklerEn: ['Major Scale', 'Minor Scale', 'Phrygian Mode', 'Blues Scale'],
-    dogruCevap: 'Majör Gam',
-    aciklama: 'Mahur makamı Batı majör gamına çok yakındır.', aciklamaEn: 'Mahur maqam is very close to the Western major scale.' },
-  { id: 'q6', tip: 'coktan-secmeli', kategori: 'makam', zorluk: 2,
-    soru: 'Uşşak makamının güçlüsü hangi perdedir?', soruEn: 'What is the dominant of Ussak maqam?',
-    secenekler: ['Re', 'Sol', 'Mi', 'La'], seçeneklerEn: ['D', 'G', 'E', 'A'], dogruCevap: 'Re',
-    aciklama: 'Uşşak makamında güçlü perde Re\'dir.', aciklamaEn: 'The dominant of Ussak maqam is D.' },
-  { id: 'q7', tip: 'coktan-secmeli', kategori: 'makam', zorluk: 2,
-    soru: 'Hangisi "inici" seyirli bir makamdır?', soruEn: 'Which has a descending progression?',
-    secenekler: ['Uşşak', 'Rast', 'Hicaz', 'Mahur'], seçeneklerEn: ['Ussak', 'Rast', 'Hijaz', 'Mahur'],
-    dogruCevap: 'Uşşak',
-    aciklama: 'Uşşak makamı inici seyirlidir.', aciklamaEn: 'Ussak maqam has a descending progression.' },
-  { id: 'q8', tip: 'coktan-secmeli', kategori: 'makam', zorluk: 2,
-    soru: 'Türk müziğinde bir oktav kaç komadan oluşur?', soruEn: 'How many commas in one octave?',
-    secenekler: ['53', '48', '36', '24'], seçeneklerEn: ['53', '48', '36', '24'], dogruCevap: '53',
-    aciklama: 'AEU sisteminde bir oktav 53 komaya bölünür.', aciklamaEn: 'In the AEU system, one octave is 53 commas.' },
-  { id: 'q9', tip: 'coktan-secmeli', kategori: 'makam', zorluk: 2,
-    soru: 'Hüseyni makamının güçlüsü hangi perdedir?', soruEn: 'What is the dominant of Huseyni maqam?',
-    secenekler: ['Mi', 'La', 'Re', 'Sol'], seçeneklerEn: ['E', 'A', 'D', 'G'], dogruCevap: 'Mi',
-    aciklama: 'Hüseyni makamında güçlü perde Mi\'dir.', aciklamaEn: 'The dominant of Huseyni maqam is E.' },
-  { id: 'q10', tip: 'coktan-secmeli', kategori: 'makam', zorluk: 2,
-    soru: 'Saba makamının durağı hangi perdedir?', soruEn: 'What is the tonic of Saba maqam?',
-    secenekler: ['Re', 'La', 'Sol', 'Mi'], seçeneklerEn: ['D', 'A', 'G', 'E'], dogruCevap: 'Re',
-    aciklama: 'Saba makamı Re perdesinde duraklar.', aciklamaEn: 'Saba maqam rests on D.' },
-  { id: 'q11', tip: 'coktan-secmeli', kategori: 'makam', zorluk: 3,
-    soru: 'Segah makamının durağı hangi perdedir?', soruEn: 'What is the tonic of Segah maqam?',
-    secenekler: ['Si koma♭', 'Mi', 'La', 'Re'], seçeneklerEn: ['B komalı♭', 'E', 'A', 'D'],
-    dogruCevap: 'Si koma♭',
-    aciklama: 'Segah makamı Si koma♭ perdesinde duraklar.', aciklamaEn: 'Segah maqam rests on B komalı♭.' },
-  { id: 'q12', tip: 'coktan-secmeli', kategori: 'makam', zorluk: 3,
-    soru: 'Hicaz makamında 2. ve 3. derece arasında kaç koma vardır?', soruEn: 'How many commas between 2nd and 3rd degrees in Hijaz?',
-    secenekler: ['13', '9', '5', '4'], seçeneklerEn: ['13', '9', '5', '4'], dogruCevap: '13',
-    aciklama: 'Hicaz\'ın arttırılmış ikili aralığı 13 komadır.', aciklamaEn: 'The augmented second of Hijaz is 13 commas.' },
-  { id: 'q13', tip: 'coktan-secmeli', kategori: 'makam', zorluk: 3,
-    soru: 'Kürdî makamının seyri nasıldır?', soruEn: 'What is the progression of Kurdi maqam?',
-    secenekler: ['İnici', 'Çıkıcı', 'İnici-çıkıcı', 'Durağan'], seçeneklerEn: ['Descending', 'Ascending', 'Ascending-Descending', 'Static'],
-    dogruCevap: 'İnici',
-    aciklama: 'Kürdî makamı inici seyirlidir.', aciklamaEn: 'Kurdi maqam has a descending progression.' },
-  { id: 'q14', tip: 'coktan-secmeli', kategori: 'bati', zorluk: 1,
-    soru: 'Majör gamda yarım sesler hangi dereceler arasındadır?', soruEn: 'Where are the half steps in major scale?',
-    secenekler: ['3-4 ve 7-8', '2-3 ve 6-7', '1-2 ve 4-5', '4-5 ve 7-8'], seçeneklerEn: ['3-4 and 7-8', '2-3 and 6-7', '1-2 and 4-5', '4-5 and 7-8'],
-    dogruCevap: '3-4 ve 7-8',
-    aciklama: 'Majör gamda yarım sesler 3-4 ve 7-8 dereceleri arasındadır (mi-fa, si-do).', aciklamaEn: 'Half steps in major scale are between degrees 3-4 and 7-8 (E-F, B-C).' },
-  { id: 'q15', tip: 'coktan-secmeli', kategori: 'bati', zorluk: 1,
-    soru: 'Pentatonik majör gam kaç sesten oluşur?', soruEn: 'How many notes in major pentatonic?',
-    secenekler: ['5', '7', '6', '8'], seçeneklerEn: ['5', '7', '6', '8'], dogruCevap: '5',
-    aciklama: 'Pentatonik (penta=beş) gam 5 sesten oluşur.', aciklamaEn: 'Pentatonic (penta=five) scale has 5 notes.' },
-  { id: 'q16', tip: 'coktan-secmeli', kategori: 'bati', zorluk: 1,
-    soru: 'Blues gamı hangi gamın üzerine inşa edilmiştir?', soruEn: 'The blues scale is built upon which scale?',
-    secenekler: ['Minör Pentatonik', 'Majör Pentatonik', 'Dorian Mod', 'Harmonik Minör'],
-    seçeneklerEn: ['Minor Pentatonic', 'Major Pentatonic', 'Dorian Mode', 'Harmonic Minor'],
-    dogruCevap: 'Minör Pentatonik',
-    aciklama: 'Blues gamı, minör pentatoniğe "blue note" eklenerek oluşur.', aciklamaEn: 'Blues scale is minor pentatonic plus the "blue note".' },
-  { id: 'q17', tip: 'coktan-secmeli', kategori: 'bati', zorluk: 2,
-    soru: 'Dorian modun majörden farkı nedir?', soruEn: 'How does Dorian differ from major?',
-    secenekler: ['3. ve 7. dereceler pesttir', 'Sadece 3. derece pesttir', '3., 6. ve 7. dereceler pesttir', '2. ve 6. dereceler tizdir'],
-    seçeneklerEn: ['3rd and 7th are lowered', 'Only 3rd is lowered', '3rd, 6th and 7th are lowered', '2nd and 6th are raised'],
-    dogruCevap: '3. ve 7. dereceler pesttir',
-    aciklama: 'Dorian modda majöre göre 3. ve 7. dereceler pesttir.', aciklamaEn: 'Dorian has lowered 3rd and 7th degrees compared to major.' },
-  { id: 'q18', tip: 'coktan-secmeli', kategori: 'bati', zorluk: 2,
-    soru: 'Frigyen modun en belirgin özelliği nedir?', soruEn: 'What characterizes Phrygian mode?',
-    secenekler: ['2. derecesi pesttir', '4. derecesi tizdir', '6. derecesi pesttir', '7. derecesi doğaldır'],
-    seçeneklerEn: ['2nd degree is lowered', '4th is raised', '6th is lowered', '7th is natural'],
-    dogruCevap: '2. derecesi pesttir',
-    aciklama: 'Frigyen modun karakteri pestle 2. derecesinden gelir.', aciklamaEn: 'Phrygian gets its character from the lowered 2nd degree.' },
-  { id: 'q19', tip: 'coktan-secmeli', kategori: 'bati', zorluk: 2,
-    soru: 'Harmonik minör doğal minörden nasıl farklıdır?', soruEn: 'How does harmonic minor differ from natural minor?',
-    secenekler: ['7. derece yarım ses tizdir', '6. derece yarım ses tizdir', '3. derece yarım ses tizdir', '2. derece yarım ses pesttir'],
-    seçeneklerEn: ['7th is raised half step', '6th is raised', '3rd is raised', '2nd is lowered'],
-    dogruCevap: '7. derece yarım ses tizdir',
-    aciklama: 'Harmonik minörde 7. derece yarım ses tizleştirilir.', aciklamaEn: 'In harmonic minor, the 7th degree is raised by a half step.' },
-  { id: 'q20', tip: 'coktan-secmeli', kategori: 'bati', zorluk: 2,
-    soru: 'Lidyen mod majörden nasıl farklıdır?', soruEn: 'How does Lydian differ from major?',
-    secenekler: ['4. derece yarım ses tizdir', '7. derece yarım ses pesttir', '3. derece yarım ses pesttir', '6. derece yarım ses tizdir'],
-    seçeneklerEn: ['4th is raised half step', '7th is lowered', '3rd is lowered', '6th is raised'],
-    dogruCevap: '4. derece yarım ses tizdir',
-    aciklama: 'Lidyen modda 4. derece yarım ses tizdir. Parlak ve gizemli bir his verir.', aciklamaEn: 'Lydian has a raised 4th degree, giving a bright and mysterious feel.' },
-  { id: 'q21', tip: 'coktan-secmeli', kategori: 'bati', zorluk: 3,
-    soru: 'Miksolidyen mod hangi türde en yaygın kullanılır?', soruEn: 'Where is Mixolydian most commonly used?',
-    secenekler: ['Blues ve Rock', 'Klasik Müzik', 'Caz Balesi', 'Romantik Müzik'], seçeneklerEn: ['Blues and Rock', 'Classical', 'Jazz Ballet', 'Romantic'],
-    dogruCevap: 'Blues ve Rock',
-    aciklama: 'Miksolidyen modun pestle 7. derecesi blues ve rock\'ın karakteristik sesini yaratır.', aciklamaEn: 'Mixolydian\'s lowered 7th creates the characteristic blues and rock sound.' },
-  { id: 'q22', tip: 'coktan-secmeli', kategori: 'bati', zorluk: 3,
-    soru: 'Minör pentatonik gamda kaç yarım ses vardır?', soruEn: 'How many half steps in minor pentatonic?',
-    secenekler: ['0', '1', '2', '3'], seçeneklerEn: ['0', '1', '2', '3'], dogruCevap: '0',
-    aciklama: 'Pentatonik gamlarda yarım ses yoktur. Bu yüzden kulağa uyumlu gelir.', aciklamaEn: 'Pentatonic scales have no half steps. This is why they sound harmonious.' },
-  { id: 'q23', tip: 'coktan-secmeli', kategori: 'bati', zorluk: 3,
-    soru: 'Doğal minör gamın kaçıncı modu Dorian\'dır?', soruEn: 'Which mode of natural minor is Dorian?',
-    secenekler: ['2. mod', '1. mod', '3. mod', '4. mod'], seçeneklerEn: ['2nd mode', '1st mode', '3rd mode', '4th mode'],
-    dogruCevap: '2. mod',
-    aciklama: 'Dorian, majör gamın 2. modudur. Re\'den başlayan majör gam dizisidir.', aciklamaEn: 'Dorian is the 2nd mode of the major scale, starting from D.' },
+  // MAKAM KOLAY
+  {id:'q1',tip:'coktan-secmeli',kategori:'makam',zorluk:1,soru:'Rast makamının durağı hangi perdedir?',secenekler:['Sol','La','Re','Do'],dogruCevap:'Sol',aciklama:'Rast makamı Sol perdesinde durur (G3 = 196 Hz).',makamId:'rast'},
+  {id:'q2',tip:'coktan-secmeli',kategori:'makam',zorluk:1,soru:'Hicaz makamının karakteristik özelliği nedir?',secenekler:['Arttırılmış ikili aralık içerir','Sadece tam seslerden oluşur','Pentatonik yapıya sahiptir','Majör karakterlidir'],dogruCevap:'Arttırılmış ikili aralık içerir',aciklama:'Hicaz Mi♭ koma ile Fa♯ arasındaki 13 komalık büyük artık ikili ile tanınır.',makamId:'hicaz'},
+  {id:'q3',tip:'coktan-secmeli',kategori:'makam',zorluk:1,soru:'Nihavend makamı hangi Batı moduna en yakındır?',secenekler:['Doğal Minör','Majör','Frigyen','Dorian'],dogruCevap:'Doğal Minör',aciklama:'Nihavend Batı doğal minörüne en yakın makamdır.',makamId:'nihavend'},
+  {id:'q4',tip:'coktan-secmeli',kategori:'makam',zorluk:1,soru:'Mahur makamı hangi Batı gamına benzer?',secenekler:['Majör Gam','Minör Gam','Frigyen Mod','Blues Gamı'],dogruCevap:'Majör Gam',aciklama:'Mahur makamı Batı majör gamına çok yakındır.'},
+  {id:'q5',tip:'coktan-secmeli',kategori:'makam',zorluk:1,soru:'Rast makamının seyir tipi nedir?',secenekler:['Çıkıcı','İnici','İnici-çıkıcı','Sabit'],dogruCevap:'Çıkıcı',aciklama:'Rast çıkıcı seyirlidir — aşağıdan yukarı hareket eder.',makamId:'rast'},
+  {id:'q6',tip:'coktan-secmeli',kategori:'makam',zorluk:1,soru:'Uşşak makamının seyir tipi nedir?',secenekler:['İnici','Çıkıcı','İnici-çıkıcı','Dairesel'],dogruCevap:'İnici',aciklama:'Uşşak inici seyirlidir — yukarıdan aşağı hareket eder.',makamId:'usak'},
+  {id:'q7',tip:'coktan-secmeli',kategori:'makam',zorluk:1,soru:'Hicaz makamının durağı hangi perdedir?',secenekler:['Re','Sol','La','Si'],dogruCevap:'Re',aciklama:'Hicaz Re perdesi üzerinde durur (D4 = 293.66 Hz).',makamId:'hicaz'},
+  {id:'q8',tip:'coktan-secmeli',kategori:'makam',zorluk:1,soru:'Segah makamı hangi müzik türünde sıkça kullanılır?',secenekler:['Tasavvuf müziği','Halk müziği','Pop','Rock'],dogruCevap:'Tasavvuf müziği',aciklama:'Segah derin mistik karakteriyle ilahi ve tasavvuf müziğinde kullanılır.',makamId:'segah'},
+  {id:'q9',tip:'coktan-secmeli',kategori:'makam',zorluk:1,soru:'Rast makamının güçlü perdesi hangisidir?',secenekler:['Re','La','Mi','Sol'],dogruCevap:'Re',aciklama:'Rast makamında güçlü perde Re dir.',makamId:'rast'},
+  {id:'q10',tip:'coktan-secmeli',kategori:'makam',zorluk:1,soru:'Hüseyni makamının durağı hangi perdedir?',secenekler:['La','Sol','Re','Mi'],dogruCevap:'La',aciklama:'Hüseyni La perdesinde durur (A3 = 220 Hz).',makamId:'huseyni'},
+  {id:'q11',tip:'coktan-secmeli',kategori:'makam',zorluk:1,soru:'Nihavend makamının durağı hangi perdedir?',secenekler:['Re','La','Sol','Mi'],dogruCevap:'Re',aciklama:'Nihavend Re perdesi üzerinde kurulur (D4).',makamId:'nihavend'},
+  {id:'q12',tip:'coktan-secmeli',kategori:'makam',zorluk:1,soru:'Uşşak makamının durağı hangi perdedir?',secenekler:['La','Sol','Re','Si'],dogruCevap:'La',aciklama:'Uşşak La perdesi üzerinde kurulur (A3 = 220 Hz).',makamId:'usak'},
+  // MAKAM ORTA
+  {id:'q13',tip:'coktan-secmeli',kategori:'makam',zorluk:2,soru:'Uşşak makamının güçlüsü hangi perdedir?',secenekler:['Re','Sol','Mi','La'],dogruCevap:'Re',aciklama:'Uşşak makamında güçlü perde Re dir.',makamId:'usak'},
+  {id:'q14',tip:'coktan-secmeli',kategori:'makam',zorluk:2,soru:'Hicaz makamının güçlüsü hangi perdedir?',secenekler:['La','Sol','Re','Mi'],dogruCevap:'La',aciklama:'Hicaz in güçlüsü La perdesidir.',makamId:'hicaz'},
+  {id:'q15',tip:'coktan-secmeli',kategori:'makam',zorluk:2,soru:'Segah makamının karar perdesi hangisidir?',secenekler:['Si koma♭','La','Sol','Re'],dogruCevap:'Si koma♭',aciklama:'Segah in karar perdesi Si koma♭ dir (B3 ten yaklaşık 22.7 cent aşağıda).',makamId:'segah'},
+  {id:'q16',tip:'coktan-secmeli',kategori:'makam',zorluk:2,soru:'Rast makamında Si koma♭ perdesi standart Si♭ den nasıl farklıdır?',secenekler:['15 cent tiz','15 cent pest','Tam aynı','50 cent tiz'],dogruCevap:'15 cent tiz',aciklama:'Rast in Si koma♭ si B3 ten -15.1 cent — standart Si♭ den yaklaşık 15 cent tiz çalınır.',makamId:'rast'},
+  {id:'q17',tip:'coktan-secmeli',kategori:'makam',zorluk:2,soru:'Hicaz makamında büyük artık ikili hangi perdeler arasındadır?',secenekler:['Mi♭ koma – Fa♯','Re – Mi♭ koma','Fa♯ – Sol','La – Si♭ koma'],dogruCevap:'Mi♭ koma – Fa♯',aciklama:'Hicaz in karakteristik büyük artık aralığı Mi♭ koma ile Fa♯ arasında — 13 koma.',makamId:'hicaz'},
+  {id:'q18',tip:'coktan-secmeli',kategori:'makam',zorluk:2,soru:'Hangisi inici-çıkıcı seyirli bir makamdır?',secenekler:['Hicaz','Rast','Uşşak','Mahur'],dogruCevap:'Hicaz',aciklama:'Hicaz inici-çıkıcı seyir gösterir.',makamId:'hicaz'},
+  {id:'q19',tip:'coktan-secmeli',kategori:'makam',zorluk:2,soru:'Hüseyni makamının güçlüsü hangi perdedir?',secenekler:['Mi','La','Sol','Re'],dogruCevap:'Mi',aciklama:'Hüseyni nin güçlüsü Mi perdesidir.',makamId:'huseyni'},
+  {id:'q20',tip:'coktan-secmeli',kategori:'makam',zorluk:2,soru:'Yeden nedir?',secenekler:['Karara çekim yapan perde','Güçlü den bir üst perde','Makamın ilk perdesi','En tiz perde'],dogruCevap:'Karara çekim yapan perde',aciklama:'Yeden karar perdesinin hemen altında yer alan ve karara güçlü çekim yapan perdedir.'},
+  {id:'q21',tip:'coktan-secmeli',kategori:'makam',zorluk:2,soru:'Rast makamının yeden perdesi hangisidir?',secenekler:['Fa♯ koma♭','Mi','La','Si koma♭'],dogruCevap:'Fa♯ koma♭',aciklama:'Rast in yeden perdesi Fa♯ koma♭ dir — Sol kararına güçlü çekim yapar.',makamId:'rast'},
+  {id:'q22',tip:'coktan-secmeli',kategori:'makam',zorluk:2,soru:'Hicaz makamının yeden perdesi hangisidir?',secenekler:['Do♯','Si♭ koma','La','Fa♯'],dogruCevap:'Do♯',aciklama:'Hicaz in yeden perdesi Do♯ dir — Re kararına çekim yapar.',makamId:'hicaz'},
+  {id:'q23',tip:'coktan-secmeli',kategori:'makam',zorluk:2,soru:'Nihavend i doğal minörden ayıran özellik nedir?',secenekler:['İnici seyirde Do♯ kullanımı','Sol♯ perdesi','Büyük artık ikili','Pentatonik yapı'],dogruCevap:'İnici seyirde Do♯ kullanımı',aciklama:'Nihavend in dramatik karakteri harmonik Do♯ perdesinden gelir.',makamId:'usak'},
+  {id:'q24',tip:'coktan-secmeli',kategori:'makam',zorluk:2,soru:'Segah makamının güçlüsü hangi perdedir?',secenekler:['Mi koma♭','La','Sol','Re'],dogruCevap:'Mi koma♭',aciklama:'Segah in güçlüsü Mi koma♭ dir (E4 ten yaklaşık 24.5 cent aşağıda).',makamId:'segah'},
+  {id:'q25',tip:'coktan-secmeli',kategori:'makam',zorluk:2,soru:'Uşşak ve Hüseyni hangi ortak özelliği paylaşır?',secenekler:['Her ikisi La üzerinde karar yapar','Her ikisi çıkıcı seyirlidir','Her ikisi Re güçlüdür','Hicaz ailesinden gelir'],dogruCevap:'Her ikisi La üzerinde karar yapar',aciklama:'Uşşak ve Hüseyni her ikisi de La (A3 = 220 Hz) karar perdesi paylaşır.',makamId:'huseyni'},
+  // MAKAM İLERİ
+  {id:'q26',tip:'coktan-secmeli',kategori:'makam',zorluk:3,soru:'Rast dizisinde Si koma♭ kaçıncı komdadır?',secenekler:['17 koma','9 koma','22 koma','13 koma'],dogruCevap:'17 koma',aciklama:'Rast dizisi [9,8,5...] — Sol dan 9+8=17 koma — Si koma♭ konumundadır.',makamId:'rast'},
+  {id:'q27',tip:'coktan-secmeli',kategori:'makam',zorluk:3,soru:'AEU sisteminde bir oktav kaç komaya bölünmüştür?',secenekler:['53','24','41','72'],dogruCevap:'53',aciklama:'Arel-Ezgi-Uzdilek (AEU) sistemi bir oktavı 53 komaya böler.'},
+  {id:'q28',tip:'coktan-secmeli',kategori:'makam',zorluk:3,soru:'Hicaz makamında Mi♭ koma standart Mi♭ den nasıl farklıdır?',secenekler:['9.5 cent pest','9.5 cent tiz','Tam aynı','25 cent pest'],dogruCevap:'9.5 cent pest',aciklama:'Hicaz in Mi♭ koması D#4 ten -9.5 cent — standart Mi♭ den yaklaşık 9.5 cent aşağıda.',makamId:'hicaz'},
+  {id:'q29',tip:'coktan-secmeli',kategori:'makam',zorluk:3,soru:'Segah makamının karar perdesi yaklaşık kaç Hz dir?',secenekler:['243 Hz','247 Hz','233 Hz','261 Hz'],dogruCevap:'243 Hz',aciklama:'Segah karar perdesi Si koma♭ yaklaşık 243.73 Hz dir.',makamId:'segah'},
+  {id:'q30',tip:'coktan-secmeli',kategori:'makam',zorluk:3,soru:'Hüseyni de Do koma standart Do dan nasıl farklıdır?',secenekler:['17 cent tiz','17 cent pest','Tam aynı','50 cent tiz'],dogruCevap:'17 cent tiz',aciklama:'Hüseyni nin Do koması C4 ten +17 cent tiz çalınır.',makamId:'huseyni'},
+  {id:'q31',tip:'coktan-secmeli',kategori:'makam',zorluk:3,soru:'Hicaz için hangisi yanlıştır?',secenekler:['Çıkıcı seyirlidir','Büyük artık ikili içerir','Re üzerinde karar yapar','La güçlü perdesidir'],dogruCevap:'Çıkıcı seyirlidir',aciklama:'Hicaz inici-çıkıcı seyirlidir, sadece çıkıcı değil.',makamId:'hicaz'},
+  {id:'q32',tip:'coktan-secmeli',kategori:'makam',zorluk:3,soru:'Uşşak ta Fa koma yaklaşık kaç Hz dir?',secenekler:['348 Hz','370 Hz','329 Hz','392 Hz'],dogruCevap:'348 Hz',aciklama:'Uşşak in Fa koması F4 + (-7.5 cent) = yaklaşık 347.71 Hz.',makamId:'usak'},
+  // TEORİ
+  {id:'q33',tip:'coktan-secmeli',kategori:'teori',zorluk:1,soru:'Türk müziğinde bir tam ses kaç komadır?',secenekler:['9','8','5','4'],dogruCevap:'9',aciklama:'AEU sisteminde 1 tanini (tam ses) = 9 komadır.'},
+  {id:'q34',tip:'coktan-secmeli',kategori:'teori',zorluk:1,soru:'1 koma kaç cent e eşittir?',secenekler:['22.6 cent','12 cent','50 cent','100 cent'],dogruCevap:'22.6 cent',aciklama:'1 koma = 1200/53 ≈ 22.642 cent.'},
+  {id:'q35',tip:'coktan-secmeli',kategori:'teori',zorluk:1,soru:'Durak (karar) perdesi ne anlama gelir?',secenekler:['Seyirin bittiği ve dinlendiği perde','En tiz perde','Makamın ikinci perdesi','Güçlü perde'],dogruCevap:'Seyirin bittiği ve dinlendiği perde',aciklama:'Durak (karar) perdesi seyirin tamamlandığı ve dinlenilen perdedir.'},
+  {id:'q36',tip:'coktan-secmeli',kategori:'teori',zorluk:1,soru:'Güçlü perde ne anlama gelir?',secenekler:['Seyirde en çok durulan ikinci perde','Karara en yakın perde','En pest perde','Yeden perdesi'],dogruCevap:'Seyirde en çok durulan ikinci perde',aciklama:'Güçlü perde seyirde duraklar ve üzerinde yoğunlaşılan ikinci önemli perdedir.'},
+  {id:'q37',tip:'coktan-secmeli',kategori:'teori',zorluk:1,soru:'A4 (La4) notasının standart frekansı kaç Hz dir?',secenekler:['440 Hz','432 Hz','446 Hz','480 Hz'],dogruCevap:'440 Hz',aciklama:'Uluslararası standart akort A4 = 440 Hz dir.'},
+  {id:'q38',tip:'coktan-secmeli',kategori:'teori',zorluk:2,soru:'Oktav yukarı çıkınca frekans nasıl değişir?',secenekler:['2 katına çıkar','Yarıya iner','100 Hz artar','Değişmez'],dogruCevap:'2 katına çıkar',aciklama:'Bir oktav tizleşmek frekansı tam 2 katına çıkarır. A3=220, A4=440 Hz.'},
+  {id:'q39',tip:'coktan-secmeli',kategori:'teori',zorluk:2,soru:'1 bakiye kaç komadır?',secenekler:['4 koma','5 koma','8 koma','9 koma'],dogruCevap:'4 koma',aciklama:'1 bakiye = 4 koma ≈ 90.6 cent. Hicaz in ilk aralığı 4 komadır.'},
+  {id:'q40',tip:'coktan-secmeli',kategori:'teori',zorluk:2,soru:'Bir yarım ton kaç cent tir?',secenekler:['100 cent','50 cent','200 cent','22.6 cent'],dogruCevap:'100 cent',aciklama:'1 oktav = 1200 cent, 12 yarım ton → 1 yarım ton = 100 cent.'},
+  {id:'q41',tip:'coktan-secmeli',kategori:'teori',zorluk:2,soru:'Cent birimi ne ölçer?',secenekler:['Perde yüksekliği farkını','Ses şiddetini','Ritim hızını','Akor sayısını'],dogruCevap:'Perde yüksekliği farkını',aciklama:'Cent iki perde arasındaki logaritmik frekans farkını ölçen birimdir.'},
+  {id:'q42',tip:'coktan-secmeli',kategori:'teori',zorluk:2,soru:'AEU sistemi kimin tarafından geliştirilmiştir?',secenekler:['Arel, Ezgi ve Uzdilek','Yekta, Karadeniz ve Erkin','Saadettin Kaynak','Hamparsum Limonciyan'],dogruCevap:'Arel, Ezgi ve Uzdilek',aciklama:'AEU = Arel-Ezgi-Uzdilek — 20. yüzyılda geliştirilen Türk müziği teorisi sistemi.'},
+  {id:'q43',tip:'coktan-secmeli',kategori:'teori',zorluk:2,soru:'Büyük mücennep kaç komadır?',secenekler:['8 koma','9 koma','5 koma','4 koma'],dogruCevap:'8 koma',aciklama:'Büyük mücennep = 8 koma ≈ 181 cent. Rast in ikinci aralığı.'},
+  {id:'q44',tip:'coktan-secmeli',kategori:'teori',zorluk:3,soru:'Türk müziğinde seyir ne anlama gelir?',secenekler:['Makamın karakteristik melodik hareketi','Ritim kalıbı','Çalgı grubu','Tempo'],dogruCevap:'Makamın karakteristik melodik hareketi',aciklama:'Seyir; makamın nasıl açıldığı, nerede durduğu, nasıl kapandığını belirleyen melodik yönelimdir.'},
+  {id:'q45',tip:'coktan-secmeli',kategori:'teori',zorluk:3,soru:'YIN algoritması gibi pitch detection yöntemlerinin ana sınırlılığı nedir?',secenekler:['Harmonik bileşenlerden yanılabilir','Çok hassas ölçüm yapar','Gürültüye dayanıklıdır','Polifonik çalma yapar'],dogruCevap:'Harmonik bileşenlerden yanılabilir',aciklama:'YIN temel frekans yerine harmonikleri algılayabilir — koma hassasiyetinde sorun çıkar.'},
+  {id:'q46',tip:'coktan-secmeli',kategori:'teori',zorluk:3,soru:'Cent offset ne işe yarar?',secenekler:['Standart MIDI notasından sapma miktarını verir','Notanın süresini belirler','Dinamiği ayarlar','Tempo değerini taşır'],dogruCevap:'Standart MIDI notasından sapma miktarını verir',aciklama:'Cent offset en yakın standart nota ile gerçek perde arasındaki fark — makamsal perdeleri doğru çalmak için kullanılır.'},
+  // BATI GAMLARI
+  {id:'q47',tip:'coktan-secmeli',kategori:'bati',zorluk:1,soru:'Majör gamın yarım ses adım yapısı hangisidir?',secenekler:['2-2-1-2-2-2-1','2-1-2-2-1-2-2','1-2-2-2-1-2-2','2-2-2-1-2-2-1'],dogruCevap:'2-2-1-2-2-2-1',aciklama:'Majör gam: T-T-Y-T-T-T-Y (2-2-1-2-2-2-1 yarım ses).'},
+  {id:'q48',tip:'coktan-secmeli',kategori:'bati',zorluk:1,soru:'Hangi gam neşeli ve parlak olarak tanımlanır?',secenekler:['Majör Gam','Doğal Minör','Frigyen Mod','Blues Gamı'],dogruCevap:'Majör Gam',aciklama:'Majör gam Batı müziğinin neşeli, parlak temel gamıdır.'},
+  {id:'q49',tip:'coktan-secmeli',kategori:'bati',zorluk:1,soru:'Minör pentatonik kaç sesten oluşur?',secenekler:['5','7','6','8'],dogruCevap:'5',aciklama:'Pentatonik gamlar 5 sesten oluşur.'},
+  {id:'q50',tip:'coktan-secmeli',kategori:'bati',zorluk:1,soru:'Blues gamı minör pentatoniğe hangi nota eklenerek elde edilir?',secenekler:['♭5 (blue note)','♭2','♯4','♮7'],dogruCevap:'♭5 (blue note)',aciklama:'Minör pentatonik + ♭5 (tritone) = Blues Gamı.'},
+  {id:'q51',tip:'coktan-secmeli',kategori:'bati',zorluk:1,soru:'Dorian mod hangi gamın 2. derecesinden başlar?',secenekler:['Majör Gam','Minör Gam','Pentatonik','Blues'],dogruCevap:'Majör Gam',aciklama:'Dorian = majör gamın 2. derecesinden başlayan moddur.'},
+  {id:'q52',tip:'coktan-secmeli',kategori:'bati',zorluk:1,soru:'Harmonik minör doğal minörden nasıl farklıdır?',secenekler:['7. derece yarım ses tizdir','6. derece pesttir','4. derece tizdir','3. derece tizdir'],dogruCevap:'7. derece yarım ses tizdir',aciklama:'Harmonik minörde 7. derece yarım ses tizleştirilmiştir.'},
+  {id:'q53',tip:'coktan-secmeli',kategori:'bati',zorluk:2,soru:'Lidyen modun karakteristik özelliği nedir?',secenekler:['Arttırılmış 4. derece (♯4)','Pest 7. derece','Küçük 2. derece','Azalmış 5. derece'],dogruCevap:'Arttırılmış 4. derece (♯4)',aciklama:'Lidyen deki ♯4 majörden daha parlak ve hayali bir karakter verir.'},
+  {id:'q54',tip:'coktan-secmeli',kategori:'bati',zorluk:2,soru:'Frigyen modun karakteristik özelliği nedir?',secenekler:['Küçük 2. derece (♭2)','Arttırılmış 4. derece','Pest 7. derece','Büyük 6. derece'],dogruCevap:'Küçük 2. derece (♭2)',aciklama:'Frigyen in ♭2 si çok karanlık ve egzotik — İspanyol flamenco müziğinin sesi.'},
+  {id:'q55',tip:'coktan-secmeli',kategori:'bati',zorluk:2,soru:'Miksolidyen mod majörden nasıl farklıdır?',secenekler:['7. derecesi pesttir (♭7)','3. derecesi pesttir','6. derecesi pesttir','4. derecesi tizdir'],dogruCevap:'7. derecesi pesttir (♭7)',aciklama:'Miksolidyen = majör + ♭7. Blues ve rock un dominant karakteri.'},
+  {id:'q56',tip:'coktan-secmeli',kategori:'bati',zorluk:2,soru:'Miles Davis - So What hangi modu kullanır?',secenekler:['Dorian','Lidyen','Frigyen','Miksolidyen'],dogruCevap:'Dorian',aciklama:'Miles Davis in So What parçası Re Dorian modunu kullanan modal cazın ikonik örneğidir.'},
+  {id:'q57',tip:'coktan-secmeli',kategori:'bati',zorluk:2,soru:'Tam ses gamı kaç sesten oluşur?',secenekler:['6','7','5','8'],dogruCevap:'6',aciklama:'Tam ses gamı 6 sesten oluşur — her aralık tam sestir.'},
+  {id:'q58',tip:'coktan-secmeli',kategori:'bati',zorluk:2,soru:'Hangi mod en az pratik kullanıma sahiptir?',secenekler:['Lokryen','Dorian','Lidyen','Miksolidyen'],dogruCevap:'Lokryen',aciklama:'Lokryen in ♭5 i onu çok kararsız yapar — pratikte neredeyse kullanılmaz.'},
+  {id:'q59',tip:'coktan-secmeli',kategori:'bati',zorluk:2,soru:'Doğal minörün kaçıncı dereceleri pesttir (majöre kıyasla)?',secenekler:['3., 6. ve 7.','3. ve 7.','2. ve 6.','4. ve 7.'],dogruCevap:'3., 6. ve 7.',aciklama:'Doğal minör majörden ♭3, ♭6, ♭7 ile ayrılır.'},
+  {id:'q60',tip:'coktan-secmeli',kategori:'bati',zorluk:2,soru:'Frigyen dominant mod hangi gamdan türetilir?',secenekler:['Harmonik minörün 5. derecesi','Majörün 3. derecesi','Doğal minörün 7. derecesi','Lidyen dominant'],dogruCevap:'Harmonik minörün 5. derecesi',aciklama:'Frigyen dominant = harmonik minör gamın 5. derecesinden başlayan mod.'},
+  {id:'q61',tip:'coktan-secmeli',kategori:'bati',zorluk:3,soru:'Majör gam ile Dorian modunun farkı nedir?',secenekler:['Dorian ♭3 ve ♭7 içerir','Dorian ♯4 içerir','Dorian ♭2 içerir','Dorian ♭5 içerir'],dogruCevap:'Dorian ♭3 ve ♭7 içerir',aciklama:'Dorian formülü: 1-2-♭3-4-5-6-♭7. Majörden ♭3 ve ♭7 ile ayrılır.'},
+  {id:'q62',tip:'coktan-secmeli',kategori:'bati',zorluk:3,soru:'Melodik minör ile doğal minörün farkı nedir?',secenekler:['Melodik minörde 6. ve 7. tizdir','Yalnız 7. tizdir','3. tizdir','Fark yoktur'],dogruCevap:'Melodik minörde 6. ve 7. tizdir',aciklama:'Melodik minör = doğal minör + ♮6 + ♮7 (caz versiyonu her iki yönde böyle kullanılır).'},
+  {id:'q63',tip:'coktan-secmeli',kategori:'bati',zorluk:3,soru:'Azalmış gam (diminished scale) kaç sesten oluşur?',secenekler:['8','7','6','9'],dogruCevap:'8',aciklama:'Azalmış gam tam-yarım simetrik yapısıyla 8 sesten oluşur.'},
+  {id:'q64',tip:'coktan-secmeli',kategori:'bati',zorluk:3,soru:'Hangi besteci tam ses gamını en çok kullananlardan biridir?',secenekler:['Claude Debussy','J.S. Bach','Beethoven','Mozart'],dogruCevap:'Claude Debussy',aciklama:'Debussy Voiles ve diğer empresyonist eserlerinde tam ses gamını sıkça kullanmıştır.'},
+  {id:'q65',tip:'coktan-secmeli',kategori:'bati',zorluk:3,soru:'Majör pentatonik majör gamdan hangi dereceleri çıkarır?',secenekler:['4. ve 7.','3. ve 6.','2. ve 5.','1. ve 4.'],dogruCevap:'4. ve 7.',aciklama:'Majör pentatonik = majör gam - 4. derece - 7. derece. Yarım ses kalmaz.'},
+  // PERDE SİSTEMİ
+  {id:'q66',tip:'coktan-secmeli',kategori:'perde',zorluk:1,soru:'Sol anahtarında birinci çizgide hangi nota bulunur?',secenekler:['Mi','Sol','La','Si'],dogruCevap:'Mi',aciklama:'Sol anahtarı çizgi notaları (alttan üste): Mi-Sol-Si-Re-Fa.'},
+  {id:'q67',tip:'coktan-secmeli',kategori:'perde',zorluk:1,soru:'Sol anahtarı hangi nota için kullanılır?',secenekler:['G (Sol) notasını işaret eder','F (Fa) notasını işaret eder','C (Do) notasını işaret eder','A (La) notasını işaret eder'],dogruCevap:'G (Sol) notasını işaret eder',aciklama:'Sol anahtarı ikinci çizgide kıvrılarak Sol (G) notasını işaret eder.'},
+  {id:'q68',tip:'coktan-secmeli',kategori:'perde',zorluk:1,soru:'MIDI notası 60 hangi nota adına karşılık gelir?',secenekler:['C4 (Do4)','A4 (La4)','G3 (Sol3)','D4 (Re4)'],dogruCevap:'C4 (Do4)',aciklama:'MIDI standartlarında 60 = C4 (orta Do).'},
+  {id:'q69',tip:'coktan-secmeli',kategori:'perde',zorluk:1,soru:'MIDI 69 hangi notadır?',secenekler:['A4 (La4)','G4 (Sol4)','B4 (Si4)','C5 (Do5)'],dogruCevap:'A4 (La4)',aciklama:'MIDI 69 = A4 = 440 Hz (uluslararası akort referansı).'},
+  {id:'q70',tip:'coktan-secmeli',kategori:'perde',zorluk:1,soru:'Sol anahtarında 5 çizgi notaları alttan üste hangi sıradadır?',secenekler:['Mi-Sol-Si-Re-Fa','Do-Mi-Sol-Si-Re','La-Do-Mi-Sol-Si','Sol-Si-Re-Fa-La'],dogruCevap:'Mi-Sol-Si-Re-Fa',aciklama:'Sol anahtarı çizgi notaları: Mi(1)-Sol(2)-Si(3)-Re(4)-Fa(5).'},
+  {id:'q71',tip:'coktan-secmeli',kategori:'perde',zorluk:1,soru:'Sol anahtarında boşluk notaları (alttan üste) hangisidir?',secenekler:['Fa-La-Do-Mi','Sol-Si-Re-Fa','Mi-Sol-Si-Re','Re-Fa-La-Do'],dogruCevap:'Fa-La-Do-Mi',aciklama:'Sol anahtarı boşluk notaları: Fa-La-Do-Mi.'},
+  {id:'q72',tip:'coktan-secmeli',kategori:'perde',zorluk:2,soru:'Sol anahtarında 3. çizgi (ortadaki) hangi notadır?',secenekler:['Si','Sol','Re','La'],dogruCevap:'Si',aciklama:'3. çizgi (orta çizgi) Si notasıdır.'},
+  {id:'q73',tip:'coktan-secmeli',kategori:'perde',zorluk:2,soru:'Orta Do (C4) sol anahtarında nerede yer alır?',secenekler:['1. çizginin altındaki yardımcı çizgide','1. boşlukta','2. çizgide','3. boşlukta'],dogruCevap:'1. çizginin altındaki yardımcı çizgide',aciklama:'C4 (Orta Do) sol anahtarında portenin altında yardımcı çizgide gösterilir.'},
+  {id:'q74',tip:'coktan-secmeli',kategori:'perde',zorluk:2,soru:'Diyez (♯) işareti bir notaya ne yapar?',secenekler:['Yarım ton tizleştirir','Yarım ton pestirir','Tam ton tizleştirir','Notayı iptal eder'],dogruCevap:'Yarım ton tizleştirir',aciklama:'Diyez (♯) notayı yarım ton (100 cent) tizleştirir.'},
+  {id:'q75',tip:'coktan-secmeli',kategori:'perde',zorluk:2,soru:'Bemol (♭) işareti bir notaya ne yapar?',secenekler:['Yarım ton pestirir','Yarım ton tizleştirir','Tam ton pestirir','Notayı iptal eder'],dogruCevap:'Yarım ton pestirir',aciklama:'Bemol (♭) notayı yarım ton (100 cent) pestirir.'},
+  {id:'q76',tip:'coktan-secmeli',kategori:'perde',zorluk:2,soru:'Türk müziğinde koma neden önemlidir?',secenekler:['Makamsal perdelerin ince ayarını sağlar','Ritim birimini ölçer','Ses yüksekliği birimi','Nota süresini belirler'],dogruCevap:'Makamsal perdelerin ince ayarını sağlar',aciklama:'Koma Batı yarım tonunun yaklaşık dörtte biri — makamsal perdelerin ince ayarı için gerekli.'},
+  {id:'q77',tip:'coktan-secmeli',kategori:'perde',zorluk:2,soru:'Sol anahtarında Fa4 (F4) hangi pozisyonda yer alır?',secenekler:['1. boşlukta','3. çizgide','4. boşlukta','5. çizgide'],dogruCevap:'1. boşlukta',aciklama:'F4 sol anahtarında 1. boşlukta yer alır.'},
+  {id:'q78',tip:'coktan-secmeli',kategori:'perde',zorluk:2,soru:'MIDI nota numarası nasıl hesaplanır?',secenekler:['(Oktav+1)×12 + nota indeksi','Nota indeksi × 12 + oktav','Oktav × 7 + nota','Frekans / 440 × 69'],dogruCevap:'(Oktav+1)×12 + nota indeksi',aciklama:'C0=0, C4=60, A4=69. Formül: (oktav+1)×12 + {C=0,...,B=11}.'},
+  {id:'q79',tip:'coktan-secmeli',kategori:'perde',zorluk:3,soru:'G3 (Sol3) notasının frekansı kaç Hz dir?',secenekler:['196 Hz','220 Hz','247 Hz','261 Hz'],dogruCevap:'196 Hz',aciklama:'G3 = 196 Hz. Rast makamının karar perdesi.'},
+  {id:'q80',tip:'coktan-secmeli',kategori:'perde',zorluk:3,soru:'D4 (Re4) notasının frekansı kaç Hz dir?',secenekler:['293.66 Hz','261.63 Hz','329.63 Hz','246.94 Hz'],dogruCevap:'293.66 Hz',aciklama:'D4 = 293.66 Hz. Hicaz ve Nihavend makamlarının karar perdesi.'},
+  {id:'q81',tip:'coktan-secmeli',kategori:'perde',zorluk:3,soru:'B3 (Si3) notasının frekansı yaklaşık kaç Hz dir?',secenekler:['246.94 Hz','220 Hz','261 Hz','233 Hz'],dogruCevap:'246.94 Hz',aciklama:'B3 ≈ 246.94 Hz. Segah karar perdesi bu notadan yaklaşık 22.7 cent aşağıdadır.'},
+  {id:'q82',tip:'coktan-secmeli',kategori:'perde',zorluk:3,soru:'MIDI den Hz ye dönüşüm formülü hangisidir?',secenekler:['440 × 2^((n-69)/12)','440 × n/69','440 + n×12','n × 440/69'],dogruCevap:'440 × 2^((n-69)/12)',aciklama:'Standart MIDI-Hz dönüşüm: f = 440 × 2^((midi-69)/12).'},
+  {id:'q83',tip:'coktan-secmeli',kategori:'perde',zorluk:3,soru:'Cent cinsinden frekans farkı nasıl hesaplanır?',secenekler:['1200 × log₂(f₂/f₁)','(f₂-f₁) × 100','f₂/f₁ × 1200','12 × log₂(f₂/f₁)'],dogruCevap:'1200 × log₂(f₂/f₁)',aciklama:'İki frekans arasındaki cent farkı: 1200 × log₂(f₂/f₁).'},
+  {id:'q84',tip:'coktan-secmeli',kategori:'perde',zorluk:3,soru:'Enharmonik nedir?',secenekler:['Aynı frekansa sahip farklı isimli notalar','İki oktav arası fark','Mikrotonal sapma','Armoni terimi'],dogruCevap:'Aynı frekansa sahip farklı isimli notalar',aciklama:'C♯ ve D♭ enharmonik eşdeğerdir — eşit tampere sisteminde aynı frekans, farklı isim.'},
+  // KARIŞIK
+  {id:'q85',tip:'coktan-secmeli',kategori:'makam',zorluk:2,soru:'Hicaz ve Nihavend makamlarının ortak durağı hangisidir?',secenekler:['Re','La','Sol','Mi'],dogruCevap:'Re',aciklama:'Hem Hicaz hem de Nihavend Re (D4) perdesi üzerinde durur.',makamId:'hicaz'},
+  {id:'q86',tip:'coktan-secmeli',kategori:'bati',zorluk:2,soru:'Hangi mod İspanyol flamenco müziğinin en karakteristik modudur?',secenekler:['Frigyen','Dorian','Lidyen','Miksolidyen'],dogruCevap:'Frigyen',aciklama:'Frigyen ve Frigyen dominant İspanyol flamenco müziğinin omurgasını oluşturur.'},
+  {id:'q87',tip:'coktan-secmeli',kategori:'teori',zorluk:1,soru:'Taksim nedir?',secenekler:['Makam üzerinde serbest doğaçlama','Ritimli bir şarkı formu','Çok sesli armoni','Nota okuma yöntemi'],dogruCevap:'Makam üzerinde serbest doğaçlama',aciklama:'Taksim belirli bir makam çerçevesinde serbest doğaçlamadır.'},
+  {id:'q88',tip:'coktan-secmeli',kategori:'makam',zorluk:1,soru:'Hangisi geleneksel bir Türk müziği enstrümanı değildir?',secenekler:['Gitar (elektrik)','Ud','Ney','Keman'],dogruCevap:'Gitar (elektrik)',aciklama:'Elektrik gitar geleneksel Türk klasik müziğinde kullanılmaz.'},
+  {id:'q89',tip:'coktan-secmeli',kategori:'bati',zorluk:1,soru:'Pentatonik gam adını nereden alır?',secenekler:['Yunanca pente (5) kelimesinden','Latince penta (yıldız)','Arapça pentah','İtalyanca pentola'],dogruCevap:'Yunanca pente (5) kelimesinden',aciklama:'Pentatonik = Yunanca pente (5) + tonos (ses) → 5 sesli gam.'},
+  {id:'q90',tip:'coktan-secmeli',kategori:'teori',zorluk:2,soru:'Türk müziğinde güçlü perde ile Batı müziğindeki dominant nasıl karşılaştırılır?',secenekler:['Benzer işlev ama aynı perde olmak zorunda değil','Tamamen aynı kavramdır','Hiç ilişkileri yoktur','Güçlü her zaman 5. derecededir'],dogruCevap:'Benzer işlev ama aynı perde olmak zorunda değil',aciklama:'Her ikisi de önemli ikinci perdelerdir; ancak Batı dominantı hep 5. derecedir, Türk güçlüsü farklı konumlarda olabilir.'},
+  {id:'q91',tip:'coktan-secmeli',kategori:'perde',zorluk:2,soru:'Sol anahtarında E5 (Mi5) hangi pozisyonda yer alır?',secenekler:['4. boşlukta','5. çizgide','3. boşlukta','5. çizginin üstünde'],dogruCevap:'4. boşlukta',aciklama:'E5 (Mi5) sol anahtarında 4. boşlukta yer alır.'},
+  {id:'q92',tip:'coktan-secmeli',kategori:'teori',zorluk:2,soru:'Enstrüman transpozisyonu ne anlama gelir?',secenekler:['Enstrümanın yazılan tonu farklı perdede çalması','Ses gürlük ayarı','Tempo değişimi','Armonik dizi'],dogruCevap:'Enstrümanın yazılan tonu farklı perdede çalması',aciklama:'Klarnet Sib enstrümanıdır — yazılan Do yu Sib olarak çalar.'},
+  {id:'q93',tip:'coktan-secmeli',kategori:'makam',zorluk:3,soru:'Hüseyni ve Uşşak ı birbirinden ayırt eden en belirgin özellik nedir?',secenekler:['İkinci derece (Si vs Si koma♭)','Güçlü perdenin konumu','Seyir yönü','Koma sayısı'],dogruCevap:'İkinci derece (Si vs Si koma♭)',aciklama:'Hüseyni de Si (tam), Uşşak ta Si koma♭ (18.9 cent pest). Bu fark iki makamı birbirinden ayırır.',makamId:'huseyni'},
+  {id:'q94',tip:'coktan-secmeli',kategori:'bati',zorluk:3,soru:'Lydian ve majör gamın farkı nedir?',secenekler:['Lidyende 4. derece yarım ton tizdir (♯4)','Lidyende 7. derece pesttir','Lidyende 3. derece pesttir','Lidyende 6. derece tizdir'],dogruCevap:'Lidyende 4. derece yarım ton tizdir (♯4)',aciklama:'Lidyen = majör + ♯4. Bu tek fark mistik ve hayali karakteri verir.'},
+  {id:'q95',tip:'coktan-secmeli',kategori:'teori',zorluk:3,soru:'AVAudioEngine iOS ta ne için kullanılır?',secenekler:['Düşük gecikmeli ses işleme','Grafik rendering','Ağ iletişimi','Veritabanı yönetimi'],dogruCevap:'Düşük gecikmeli ses işleme',aciklama:'AVAudioEngine Apple in iOS ta düşük gecikmeli profesyonel ses işleme çerçevesidir.'},
+  {id:'q96',tip:'coktan-secmeli',kategori:'makam',zorluk:2,soru:'Segah makamının zorluk seviyesi neden yüksektir?',secenekler:['Karar perdesi standart notanın dışındadır','Çok az perdesi vardır','Seyir tipi sabit','Güçlüsü belirsiz'],dogruCevap:'Karar perdesi standart notanın dışındadır',aciklama:'Segah in karar perdesi Si koma♭ — standart MIDI sisteminde bulunmaz, -22.7 cent offset gerekir.',makamId:'segah'},
+  {id:'q97',tip:'coktan-secmeli',kategori:'bati',zorluk:2,soru:'Rock müziğinde en sık kullanılan gam hangisidir?',secenekler:['Minör Pentatonik','Majör Gam','Dorian Mod','Lokryen Mod'],dogruCevap:'Minör Pentatonik',aciklama:'Minör pentatonik gitar soloları ve riff lerin temel gamıdır.'},
+  {id:'q98',tip:'coktan-secmeli',kategori:'teori',zorluk:1,soru:'Türk müziğinde makam kelimesi ne anlama gelir?',secenekler:['Melodik ve armonik kurallar içeren kapsamlı dizi sistemi','Sadece nota dizisi','Ritim kalıbı','Çalgı ailesi'],dogruCevap:'Melodik ve armonik kurallar içeren kapsamlı dizi sistemi',aciklama:'Makam; perde dizisini, seyir kurallarını, güçlü-yeden-karar perdelerini ve karakteri kapsayan kapsamlı bir kavramdır.'},
+  {id:'q99',tip:'coktan-secmeli',kategori:'perde',zorluk:1,soru:'Sol anahtarında hangi nota ikinci çizgiyi işaret eder?',secenekler:['Sol (G)','Mi (E)','Si (B)','Re (D)'],dogruCevap:'Sol (G)',aciklama:'Sol anahtarı ikinci çizgiyi işaret eder ve bu nedenle Sol anahtarı adını alır.'},
+  {id:'q100',tip:'coktan-secmeli',kategori:'makam',zorluk:3,soru:'Uşşak makamında Fa koma neden F4 (Fa) üzerinden tanımlanır, F#4 değil?',secenekler:['35 koma = 792.5 cent — F#4 (800c) ya 7.5 cent yakın','F# daha kulağa hoş gelir','Rast la aynı olsun diye','Geleneksel nota yazımı'],dogruCevap:'35 koma = 792.5 cent — F#4 (800c) ya 7.5 cent yakın',aciklama:'Algoritmik hesapta 35 koma = 792.5 cent, F#4 = 800 cent e sadece 7.5 cent uzakta. En yakın MIDI F#4 tir — ama Fa koma adıyla bilinir.',makamId:'usak'},
 ];
+
+export function soruFiltrele(
+  kategori?: SoruKategori,
+  zorluk?: 1 | 2 | 3,
+  makamId?: string,
+): Soru[] {
+  return sorular.filter(s =>
+    (!kategori || s.kategori === kategori) &&
+    (!zorluk   || s.zorluk   === zorluk)   &&
+    (!makamId  || s.makamId  === makamId)
+  );
+}
+
+// Bir makama özel soru havuzu: o makamın kendi soruları + genel teori soruları
+export function makamSoruHavuzu(makamId: string): Soru[] {
+  const makamOzel = sorular.filter(s => s.makamId === makamId);
+  const genelTeori = sorular.filter(s => !s.makamId && s.kategori === 'teori');
+  const perdeTemel = sorular.filter(s => !s.makamId && s.kategori === 'perde' && s.zorluk === 1);
+  return [...makamOzel, ...genelTeori.slice(0, 5), ...perdeTemel.slice(0, 3)]
+    .sort(() => Math.random() - 0.5);
+}
+
+export function rastgeleSorular(sayi: number, kategori?: SoruKategori, zorluk?: 1 | 2 | 3): Soru[] {
+  const havuz = soruFiltrele(kategori, zorluk);
+  return [...havuz].sort(() => Math.random() - 0.5).slice(0, sayi);
+}

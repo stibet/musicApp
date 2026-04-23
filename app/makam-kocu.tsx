@@ -9,7 +9,8 @@ import { frekansToNota } from '../src/audio/pitchDetector';
 import { playReferenceNote, playReferenceSequence, playSeyirCumlesi } from '../src/audio/referencePlayer';
 import {
   buildSequenceForMode, coachInstruments, noteLabelFromMode, practiceMakamlari,
-  transposeOptions, type CoachInstrumentId, type NotaGosterimModu, type PracticeMode,
+  transposeOptions, transposeMidi, midiToWesternLabel,
+  type CoachInstrumentId, type NotaGosterimModu, type PracticeMode,
 } from '../src/data/makamPracticeDefs';
 import { analyzeAgainstTarget, buildSessionSummary, summarizeAttempts, type AttemptItem } from '../src/practice/coachAnalyzer';
 import { saveCoachSession } from '../src/store/sessionHistory';
@@ -383,10 +384,18 @@ export default function MakamKocuScreen() {
             ))}
           </View>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.chipRow}>
-            {transposeOptions.map(t => (
-              <Chip key={t.label} label={t.semitones === 0 ? 'Yerinde' : `${t.semitones > 0 ? '+' : ''}${t.semitones} ys`}
-                active={transpose === t.semitones} onPress={() => setTranspose(t.semitones)} />
-            ))}
+            {transposeOptions.map(t => {
+              const karar = selected.practice.steps[0];
+              const transposedMidi = transposeMidi(karar.midi, t.semitones);
+              const notaAdi = midiToWesternLabel(transposedMidi);
+              const label = t.semitones === 0
+                ? `Yerinde · ${karar.turkish}`
+                : `${t.semitones > 0 ? '+' : ''}${t.semitones} ys · ${notaAdi}`;
+              return (
+                <Chip key={t.label} label={label}
+                  active={transpose === t.semitones} onPress={() => setTranspose(t.semitones)} />
+              );
+            })}
           </ScrollView>
         </Section>
 

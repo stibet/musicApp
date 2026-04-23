@@ -1,5 +1,3 @@
-Core ML + SoundAnalysis — iPhone Neural Engine'inde çalışır, Apple Silicon optimize, en düşük pil tüketimi, gerçek zamanlı
-
 # Makam Coach – Final Source Package
 
 Bu paket, uygulamanın kaynak kodudur.

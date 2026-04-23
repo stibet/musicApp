@@ -85,12 +85,12 @@ export default function HomeScreen() {
       <Text style={s.bolumBaslik}>Araçlar</Text>
 
       {[
-        { emoji:'🧠', baslik:'Teori Quiz',          alt:'Makam ve gam sorularıyla bilgini test et', rota:'/quiz',      renk: C.violet },
+        { emoji:'🧠', baslik:'Karışık Quiz',        alt:'Tüm kategorilerden rastgele sorular',       rota:'/quiz',      renk: C.violet, params: { mod: 'karisik' } },
         { emoji:'🗂', baslik:'Makam Ansiklopedisi', alt:'Koma dizisi, perdeler, videolar',          rota:'/makamlar',  renk: C.gold },
         { emoji:'🎼', baslik:'Batı Gamları',        alt:'Modlar ve gamlar',                         rota:'/gamlar',    renk: C.teal },
       ].map((m, i) => (
         <TouchableOpacity key={i} style={[s.modulKart, { borderLeftColor: m.renk }]}
-          activeOpacity={0.8} onPress={() => router.push(m.rota as any)}>
+          activeOpacity={0.8} onPress={() => router.push({ pathname: m.rota as any, params: (m as any).params })}>
           <View style={[s.modulIkon, { backgroundColor: m.renk + '22' }]}>
             <Text style={{ fontSize: 22 }}>{m.emoji}</Text>
           </View>

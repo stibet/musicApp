@@ -4,7 +4,11 @@ import { C, F, R } from '../constants/Design';
 import { makamlar } from '../src/data/makamlar';
 import { yedenler } from '../src/makam/centTables';
 import { seyirKaliplari, seyirYonAciklama } from '../src/makam/seyirPatterns';
+import { solAnahtariHTML, makamMidiListesi } from '../components/SolAnahtari';
+import { centTablosu } from '../src/makam/centTables';
+import { Platform } from 'react-native';
 import { makamVideolari, MakamVideo, seviyeLabel, seviyeRenk } from '../src/data/videolar';
+import { makamSoruHavuzu } from '../src/data/sorular';
 
 const SEYIR_RENK: Record<string, string> = { 'çıkıcı': C.green, 'inici': C.red, 'inici-çıkıcı': C.amber };
 
@@ -66,6 +70,8 @@ export default function MakamDetayScreen() {
   );
 
   const videolar = makamVideolari[makam.id] || [];
+  const centDereceler = centTablosu[makam.id] ?? [];
+  const quizSayisi = makamSoruHavuzu(makam.id).length;
 
   return (
     <SafeAreaView style={s.container}>
@@ -100,78 +106,90 @@ export default function MakamDetayScreen() {
           <Text style={s.bolumIcerik}>{makam.aciklama}</Text>
         </View>
 
-        {/* Perde dizisi + koma aralıkları */}
-        <View style={s.bolum}>
-          <Text style={s.bolumBaslik}>Perde Dizisi ve Koma Aralıkları</Text>
-          <Text style={s.bolumAlt}>1 oktav = 53 koma · 1 koma ≈ 22.6 cent</Text>
+        {/* SOL ANAHTARI + NOTA DİZİSİ */}
+        {centDereceler.length > 0 && (
+          <View style={s.bolum}>
+            <Text style={s.bolumBaslik}>Nota Dizisi</Text>
 
-          <View style={s.diziBand}>
-            {makam.perdeler.map((perde, i) => {
-              const isDurak = i === 0 || i === makam.perdeler.length - 1;
-              const isGuclu = perde === makam.guclu && !isDurak;
-              const komaAraligi = makam.komaDizisi[i];
-              const { isim: komaIsim, renk: komaRenk } = komaAraligi ? komaAcikla(komaAraligi) : { isim: '', renk: '' };
-
+            {/* Sol anahtarı SVG — web only */}
+            {Platform.OS === 'web' && (() => {
+              const { notalar, perdeAdlari } = makamMidiListesi(centDereceler.map(d => ({ midi: d.midi, perde: d.perde })));
+              const svgHtml = solAnahtariHTML(notalar, perdeAdlari, -1, 340);
               return (
-                <View key={i} style={s.perdeBlok}>
-                  <View style={[
-                    s.perdeKutu,
-                    isDurak && { borderColor: C.gold, backgroundColor: C.goldGlow },
-                    isGuclu && { borderColor: C.amber, backgroundColor: C.amber + '18' },
-                  ]}>
-                    <Text style={[s.perdeAd, isDurak && { color: C.gold }, isGuclu && { color: C.amber }]}>
-                      {perde}
-                    </Text>
-                    {isDurak && <Text style={[s.perdeRol, { color: C.gold }]}>durak</Text>}
-                    {isGuclu && <Text style={[s.perdeRol, { color: C.amber }]}>güçlü</Text>}
-                  </View>
-
-                  {komaAraligi !== undefined && (
-                    <View style={s.aralik}>
-                      <View style={[s.aralikCizgi, { backgroundColor: komaRenk + '66' }]} />
-                      <View style={[s.aralikBadge, { backgroundColor: komaRenk + '18', borderColor: komaRenk + '55' }]}>
-                        <Text style={[s.aralikKoma, { color: komaRenk }]}>{komaAraligi} koma</Text>
-                        <Text style={[s.aralikCent, { color: komaRenk + 'aa' }]}>{komaToCent(komaAraligi)}</Text>
-                        <Text style={[s.aralikIsim, { color: komaRenk }]} numberOfLines={2}>{komaIsim}</Text>
-                      </View>
-                      <View style={[s.aralikCizgi, { backgroundColor: komaRenk + '66' }]} />
-                    </View>
-                  )}
+                <View style={s.staffKart}>
+                  <div dangerouslySetInnerHTML={{ __html: svgHtml }} />
                 </View>
               );
-            })}
-          </View>
+            })()}
 
-          <View style={s.toplamRow}>
-            <Text style={s.toplamText}>
-              Toplam: {makam.komaDizisi.reduce((a, b) => a + b, 0)} koma · {komaToCent(makam.komaDizisi.reduce((a, b) => a + b, 0))}
-            </Text>
-          </View>
-        </View>
+            {/* Yatay perde kartları */}
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 12 }}>
+              <View style={s.perdeSirasi}>
+                {centDereceler.map((d, i) => {
+                  const isKarar = d.rol === 'karar';
+                  const isGuclu = d.rol === 'guclu';
+                  const isYeden = d.rol === 'yeden';
+                  const nc = isKarar ? C.gold : isGuclu ? '#10B981' : isYeden ? C.violet : C.textSecondary;
+                  const bg = isKarar ? C.goldGlow : isGuclu ? '#10B98122' : isYeden ? C.violet + '22' : C.surface;
+                  const bc = isKarar ? C.gold + '88' : isGuclu ? '#10B98188' : isYeden ? C.violet + '88' : C.border;
+                  const komaAraligi = makam.komaDizisi[i];
+                  const { renk: komaRenk } = komaAraligi ? komaAcikla(komaAraligi) : { renk: C.border };
+                  const centStr = d.centOffset === 0 ? '' : `${d.centOffset > 0 ? '+' : ''}${d.centOffset.toFixed(1)}¢`;
 
-        {/* Koma rehberi */}
-        <View style={s.bolum}>
-          <Text style={s.bolumBaslik}>Koma Aralıkları Rehberi</Text>
-          {[
-            { koma: 4, aciklama: 'Bakiye — küçük yarım ton (~91 cent)' },
-            { koma: 5, aciklama: 'Küçük mücennep — büyük yarım ton (~113 cent)' },
-            { koma: 8, aciklama: 'Büyük mücennep — küçük tam ton (~181 cent)' },
-            { koma: 9, aciklama: 'Tanini — tam ses (~204 cent)' },
-            { koma: 13, aciklama: 'Artık ikili — Hicaz\'ın karakteristik aralığı (~295 cent)' },
-          ].map(item => {
-            const { renk } = komaAcikla(item.koma);
-            const buMakamda = makam.komaDizisi.includes(item.koma);
-            return (
-              <View key={item.koma} style={[s.rehberSatir, buMakamda && { borderLeftColor: renk, backgroundColor: renk + '08' }]}>
-                <View style={[s.rehberKoma, { backgroundColor: renk + '22', borderColor: renk + '55' }]}>
-                  <Text style={[s.rehberKomaVal, { color: renk }]}>{item.koma}</Text>
-                </View>
-                <Text style={[s.rehberAciklama, buMakamda && { color: C.textSecondary }]}>{item.aciklama}</Text>
-                {buMakamda && <Text style={[s.buMakamda, { color: renk }]}>✓</Text>}
+                  return (
+                    <View key={i} style={s.perdeKolumn}>
+                      <View style={[s.perdeKart, { backgroundColor: bg, borderColor: bc }]}>
+                        <Text style={[s.perdeIsim, { color: nc }]} numberOfLines={1} adjustsFontSizeToFit>
+                          {d.perde}
+                        </Text>
+                        {centStr ? (
+                          <Text style={[s.perdeCent, { color: d.centOffset > 0 ? '#34d399' : '#f87171' }]}>
+                            {centStr}
+                          </Text>
+                        ) : (
+                          <Text style={s.perdeCent}>●</Text>
+                        )}
+                        {(isKarar || isGuclu || isYeden) && (
+                          <View style={[s.rolBadge, { backgroundColor: nc + '22' }]}>
+                            <Text style={[s.rolText, { color: nc }]}>
+                              {isKarar ? 'karar' : isGuclu ? 'güçlü' : 'yeden'}
+                            </Text>
+                          </View>
+                        )}
+                      </View>
+
+                      {komaAraligi !== undefined && i < centDereceler.length - 1 && (
+                        <View style={s.komaOk}>
+                          <View style={[s.komaOkCizgi, { backgroundColor: komaRenk + '55' }]} />
+                          <View style={[s.komaBadge, { backgroundColor: komaRenk + '18', borderColor: komaRenk + '44' }]}>
+                            <Text style={[s.komaVal, { color: komaRenk }]}>{komaAraligi}</Text>
+                            <Text style={[s.komaLabel, { color: komaRenk + 'bb' }]}>koma</Text>
+                          </View>
+                          <View style={[s.komaOkCizgi, { backgroundColor: komaRenk + '55' }]} />
+                        </View>
+                      )}
+                    </View>
+                  );
+                })}
               </View>
-            );
-          })}
-        </View>
+            </ScrollView>
+
+            {/* Koma efsanesi */}
+            <View style={s.efsane}>
+              {[
+                { koma: 4, isim: 'Bakiye', renk: '#60a5fa' },
+                { koma: 9, isim: 'Tanini', renk: C.gold },
+                { koma: 13, isim: 'Artık ikili', renk: '#ef4444' },
+              ].filter(e => makam.komaDizisi.includes(e.koma)).map(e => (
+                <View key={e.koma} style={s.efsaneSatir}>
+                  <View style={[s.efsaneDot, { backgroundColor: e.renk }]} />
+                  <Text style={[s.efsaneText, { color: e.renk }]}>{e.koma} koma</Text>
+                  <Text style={s.efsaneIsim}>{e.isim}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
 
         {/* Yeden */}
         {yedenler[makam.id] && (
@@ -235,8 +253,8 @@ export default function MakamDetayScreen() {
             <Text style={s.btnAnaText}>Makam Koçuna Git →</Text>
           </TouchableOpacity>
           <TouchableOpacity style={s.btnIkincil} activeOpacity={0.85}
-            onPress={() => router.push({ pathname: '/quiz', params: { kategori: 'maqam' } })}>
-            <Text style={s.btnIkincilText}>Quiz Çöz</Text>
+            onPress={() => router.push({ pathname: '/quiz', params: { makamId: makam.id, makamIsim: makam.isim } })}>
+            <Text style={s.btnIkincilText}>🎯 {makam.isim} Quizi ({quizSayisi} soru)</Text>
           </TouchableOpacity>
         </View>
 
@@ -299,6 +317,7 @@ const s = StyleSheet.create({
   videoOk: { color: C.textMuted, fontSize: 22 },
 
   butonRow: { gap: 10, marginTop: 8 },
+  staffKart: { backgroundColor: C.surface, borderRadius: R.lg, padding: 12, borderWidth: 1, borderColor: C.border, alignItems: 'center', overflow: 'hidden' },
   yedenKart: { backgroundColor: C.surface2, borderRadius: R.lg, padding: 14, borderWidth: 1, borderLeftWidth: 3, borderColor: C.border, borderLeftColor: C.violet },
   yedenPerde: { color: C.violet, fontWeight: '900', fontSize: F.xl, marginBottom: 4 },
   yedenAciklama: { color: C.textSecondary, fontSize: F.sm },
@@ -310,6 +329,23 @@ const s = StyleSheet.create({
   cumleAciklama: { color: C.textSecondary, fontSize: F.xs, lineHeight: 18 },
   cumleNot: { color: C.textMuted, fontSize: F.xs - 1, marginTop: 6, fontStyle: 'italic' as const },
   btnAna: { backgroundColor: C.gold, borderRadius: R.lg, padding: 18, alignItems: 'center' },
+  perdeSirasi: { flexDirection: 'row', alignItems: 'flex-start', paddingHorizontal: 4, paddingVertical: 8 },
+  perdeKolumn: { flexDirection: 'row', alignItems: 'center' },
+  perdeKart: { width: 80, minHeight: 72, borderRadius: R.lg, borderWidth: 1.5, padding: 8, alignItems: 'center', justifyContent: 'center', gap: 3 },
+  perdeIsim: { fontWeight: '900', fontSize: F.sm, textAlign: 'center' },
+  perdeCent: { fontSize: 10, fontWeight: '600', color: C.textMuted },
+  rolBadge: { borderRadius: R.full, paddingHorizontal: 6, paddingVertical: 2, marginTop: 2 },
+  rolText: { fontSize: 9, fontWeight: '800', letterSpacing: 0.3 },
+  komaOk: { alignItems: 'center', width: 56 },
+  komaOkCizgi: { width: 16, height: 1.5, borderRadius: 1 },
+  komaBadge: { borderRadius: R.sm, borderWidth: 1, paddingHorizontal: 5, paddingVertical: 3, alignItems: 'center', marginVertical: 3 },
+  komaVal: { fontWeight: '900', fontSize: F.sm },
+  komaLabel: { fontSize: 8, fontWeight: '600' },
+  efsane: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 10, paddingHorizontal: 2 },
+  efsaneSatir: { flexDirection: 'row', alignItems: 'center', gap: 5 },
+  efsaneDot: { width: 6, height: 6, borderRadius: 3 },
+  efsaneText: { fontSize: F.xs, fontWeight: '800' },
+  efsaneIsim: { fontSize: F.xs, color: C.textMuted },
   btnAnaText: { color: C.bg, fontWeight: '900', fontSize: F.md },
   btnIkincil: { backgroundColor: C.surface, borderRadius: R.lg, padding: 18, alignItems: 'center', borderWidth: 1, borderColor: C.border },
   btnIkincilText: { color: C.textSecondary, fontWeight: '700', fontSize: F.md },

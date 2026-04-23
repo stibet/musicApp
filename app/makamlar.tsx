@@ -2,6 +2,7 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { C, F, R } from '../constants/Design';
 import { makamlar } from '../src/data/makamlar';
+import { makamSoruHavuzu } from '../src/data/sorular';
 
 const SEYIR_RENK: Record<string, string> = { 'çıkıcı': C.green, 'inici': C.red, 'inici-çıkıcı': C.amber };
 const ZORLUK_RENK = ['', C.green, C.amber, C.red];
@@ -32,6 +33,10 @@ export default function MakamlarScreen() {
               <View style={[s.zorlukDot, { backgroundColor: ZORLUK_RENK[m.zorluk] }]} />
             </View>
             <Text style={s.aciklama} numberOfLines={2}>{m.aciklama}</Text>
+            <View style={s.kartAlt}>
+              <Text style={s.quizHint}>🎯 {makamSoruHavuzu(m.id).length} soru</Text>
+              <Text style={s.detayOk}>Detay →</Text>
+            </View>
           </TouchableOpacity>
         ))}
       </ScrollView>

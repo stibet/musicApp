@@ -1,9 +1,20 @@
 // instrumentPacks.ts
 // Enstrüman ses paketleri.
-// Aşama A (şimdi): CDN tabanlı FluidR3_GM + Salamander
-// Aşama B (Mac): AVAudioUnitSampler + LABS/Philharmonia local WAV
+// Aşama A (web): CDN tabanlı FluidR3_GM + Salamander
+// Aşama B (iOS/Mac): AVAudioUnitSampler GM programları + yerel WAV (ileride)
 
 export type InstrumentId = 'clarinet' | 'piano' | 'violin' | 'ney' | 'ud' | 'guitar' | 'baglama';
+
+// General MIDI program numaraları — Aşama B native ses motoru için
+export const nativeInstrumentPrograms: Record<InstrumentId, number> = {
+  clarinet: 71,  // Clarinet
+  piano:     0,  // Acoustic Grand Piano
+  violin:   40,  // Violin
+  ney:      73,  // Flute (ney yaklaşımı)
+  ud:       24,  // Acoustic Guitar (Nylon) — ud yaklaşımı
+  guitar:   25,  // Acoustic Guitar (Steel)
+  baglama:  105, // Banjo — bağlama yaklaşımı
+};
 
 export interface InstrumentPack {
   id: InstrumentId;

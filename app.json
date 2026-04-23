@@ -30,7 +30,8 @@
     },
     "plugins": [
       "expo-router",
-      ["expo-av", { "microphonePermission": "Makam Coach mikrofona erişmek istiyor — canlı perde analizi için gereklidir." }]
+      ["expo-av", { "microphonePermission": "Makam Coach mikrofona erişmek istiyor — canlı perde analizi için gereklidir." }],
+      "./modules/makam-audio"
     ],
     "experiments": {
       "typedRoutes": true
