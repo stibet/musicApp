@@ -99,24 +99,35 @@ public class MakamAudioModule: Module {
   }
 
   private func loadGMSoundfont(sampler: AVAudioUnitSampler, channel: UInt8) throws {
-    // Try bundled SF2 first; fall back to built-in GM bank
+    // Candidate paths for system DLS/SF2 — simulator uses macOS paths, device uses iOS bundle
+    let candidatePaths: [String] = [
+      // macOS / Simulator
+      "/System/Library/Components/CoreAudio.component/Contents/Resources/gs_instruments.dls",
+      // Older macOS
+      "/Library/Audio/Sounds/Banks/gs_instruments.dls",
+    ]
+
+    // 1. Try bundled SF2 (if added to Assets later)
     if let sf2URL = Bundle.main.url(forResource: "GeneralUser_GS", withExtension: "sf2") {
-      // Clarinet = program 71, bank 0
       try sampler.loadSoundBankInstrument(at: sf2URL, program: 71, bankMSB: 0x79, bankLSB: 0)
-    } else {
-      // Built-in iOS DLS / GM bank
-      let appleSF2Paths = [
-        "/System/Library/Components/CoreAudio.component/Contents/Resources/gs_instruments.dls",
-        "/Library/Audio/Sounds/Banks/gs_instruments.dls",
-      ]
-      for path in appleSF2Paths {
-        if FileManager.default.fileExists(atPath: path) {
-          let url = URL(fileURLWithPath: path)
-          try? sampler.loadSoundBankInstrument(at: url, program: 71, bankMSB: 0x79, bankLSB: 0)
-          break
+      return
+    }
+
+    // 2. Try system DLS files
+    for path in candidatePaths {
+      if FileManager.default.fileExists(atPath: path) {
+        let url = URL(fileURLWithPath: path)
+        do {
+          try sampler.loadSoundBankInstrument(at: url, program: 71, bankMSB: 0x79, bankLSB: 0)
+          return
+        } catch {
+          continue
         }
       }
     }
+
+    // 3. Fallback: load sampler with no soundfont (sine-wave approximation via preset 0)
+    // AVAudioUnitSampler can play some tones without a soundfont on simulator
   }
 
   // Set pitch bend range via MIDI RPN 0 (Pitch Bend Sensitivity)

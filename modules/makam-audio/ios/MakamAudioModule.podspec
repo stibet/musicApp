@@ -2,7 +2,7 @@ require 'json'
 package = JSON.parse(File.read(File.join(__dir__, '..', 'package.json')))
 
 Pod::Spec.new do |s|
-  s.name           = 'MakamAudio'
+  s.name           = 'MakamAudioModule'
   s.version        = package['version']
   s.summary        = 'Native AVAudioEngine bridge for microtonal Makam audio'
   s.description    = 'AVAudioUnitSampler + MIDI pitch bend for AEU koma-accurate playback. ~5ms latency, offline, no CDN.'
